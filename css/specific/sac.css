@@ -1,0 +1,30 @@
+
+
+.fullheight{
+    height: 100vh;
+}
+
+.footer {
+   position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.pointer {cursor: pointer;}
+.upperCase { text-transform:uppercase;}
+.not-allowed {cursor: not-allowed;}
+.priority {z-index: 1000;}
+
+div.sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #2C3E50;
+    
+}
+
+[v-cloak] {
+  display: none;
+}
