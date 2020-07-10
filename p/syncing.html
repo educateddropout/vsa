@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Validation Search App - Reports Page</title>
+
+    <link rel="stylesheet" href="../css/lib/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/w3css/v4/w3.css">
+    <link rel="stylesheet" type="text/css" href="../css/specific/sac.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-modal-fx-1.1.0/dist/css/modal-fx.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-steps/dist/css/bulma-steps.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-divider/dist/css/bulma-divider.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-checkradio/dist/css/bulma-checkradio.min.css"> 
+    
+</head>
+<style type="text/css">
+    .pointer {cursor: pointer;}
+    .upperCase { text-transform:uppercase;}
+    .not-allowed {cursor: not-allowed;}
+</style>
+<body>
+    
+    <div id="syncing">
+        
+        <header-nav
+            :page-counter= "pageCounter"
+            @copy-user-data = "copyUserData"
+        ></header-nav>
+
+        <br>
+        <div class="w3-row">
+            <div class="w3-col l1"> &nbsp </div>
+            <div class="w3-col l10">
+                
+                <div class="modal" :class="{'is-active' : modalMessageSyncing != ''}">
+                    <div class="modal-background" @click="closeSyncingMessage"></div>
+                    <div class="modal-content box">
+                        <span :class="{'has-text-danger' : modalSyncingIsError, 'has-text-success' : !modalSyncingIsError}">{{modalMessageSyncing}}</span>
+                    </div>
+                    <button class="modal-close is-large" aria-label="close" @click="closeSyncingMessage"></button>
+                </div>
+
+                <div class="w3-row box">
+                    <br>
+                    <div class="w3-row">
+                        <div class="w3-col l1" >&nbsp</div>
+                        <div class="w3-col l10">
+                            <div class="w3-row w3-container w3-right">
+                                <button class="button is-info" @click="syncGrievance"><i class="fas fa-sync"></i> &nbspSync</button>
+                            </div>
+                            <br>
+                            <br>
+                            <div class="w3-row w3-container ">
+                                <div v-if="loadingUnsync">
+                                    Loading list of Unsync Grievances. Please wait!... <i class="fas fa-spinner fa-pulse"></i>
+                                </div>
+                                <div v-else="">
+                                    <div v-if="listOfUnsync.length == 0">
+                                            No Grievance/s to Sync. Cheers <span class="has-text-warning"><i class="fas fa-beer"></i></span>
+                                    </div>
+                                    <div v-else="">
+                                        <table class="table is-fullwidth is-striped w3-border is-medium" style="overflow-x:auto;" >
+                                            <thead>
+                                                <tr class="has-text-white-bis has-background-grey">
+                                                    <th class="has-text-white-bis">&nbsp</th>
+                                                    <th class="has-text-white-bis">First Name</th>
+                                                    <th class="has-text-white-bis">Middle Name</abbr></th>
+                                                    <th class="has-text-white-bis" >Last Name</th>
+                                                    <th class="has-text-white-bis" >Area of Complaint</abbr></th>
+                                                    <th class="has-text-white-bis">Grievance Type</th>
+                                                    <th class="has-text-white-bis">Date Of Complaint</th>
+                                                    <th class="w3-center">
+                                                        <div class="field">
+                                                            <input class="is-checkradio has-background-color is-link" id="checkAll" type="checkbox" @click="toggleCheckAll" v-model="isCheckAll">
+                                                            <label for="checkAll">&nbsp</label>
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(unSync,index) in listOfUnsync">
+                                                    <td>{{index+1}}</td>
+                                                    <td>{{unSync.first_name}}</td>
+                                                    <td>{{unSync.middle_name}}</td>
+                                                    <td>{{unSync.last_name}}</td>
+                                                    <td>{{unSync.barangay_name}}</td>
+                                                    <td>{{grievanceType(unSync.complaint_type)}}</td>
+                                                    <td>{{unSync.last_modified}}</td>
+                                                    <td class="w3-center">
+                                                        <div class="field">
+                                                            <input class="is-checkradio is-info" :id="index" type="checkbox" v-model="unSync.isChecked">
+                                                            <label :for="index">&nbsp</label>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w3-col l1" >&nbsp</div>
+                    </div>
+                    <br>
+
+
+                </div>
+                
+                
+                
+                
+
+            </div>
+            <div class="w3-col l1"> &nbsp </div>
+        </div>
+    </div>
+
+
+    <!-- script frame -->
+    <script src="../js/lib/vue/dist/vue.js"></script>
+    <script src="../js/lib/axios/dist/axios.min.js"></script>
+    <script src="../js/lib/moment/min/moment.min.js"></script>
+    <script src="../js/components/layouts/header.js"></script>
+    <script src="../js/lib/lodash/lodash.js"></script>
+
+
+    <script src="../js/instances/syncing.js"></script>
+    <script src="../css/lib/bulma-modal-fx-1.1.0/dist/js/modal-fx.min.js"></script>
+
+    
+</body>
+
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Validation Search App - Reports Page</title>
+
+    <link rel="stylesheet" href="../css/lib/fontawesome-free/css/all.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/w3css/v4/w3.css">
+    <link rel="stylesheet" type="text/css" href="../css/specific/ad.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-modal-fx-1.1.0/dist/css/modal-fx.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-steps/dist/css/bulma-steps.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-divider/dist/css/bulma-divider.min.css"> 
+    
+</head>
+<style type="text/css">
+    .pointer {cursor: pointer;}
+    .upperCase { text-transform:uppercase;}
+    .not-allowed {cursor: not-allowed;}
+</style>
+<body>
+    
+    <div id="reports">
+        
+        <header-nav
+            :page-counter= "pageCounter"
+            @copy-user-data = "copyUserData"
+        ></header-nav>
+
+        <br>
+        <div class="w3-row">
+            <div class="w3-col l1"> &nbsp </div>
+            <div class="w3-col l10">
+                
+                <div class="w3-row box">
+
+                    ASKDHJKLJAHJKASD HJKAGSD jASGD 
+
+                    <reports-table
+                        :list-of-grievance = "listOfGrievance"
+                    >
+                    </reports-table>
+
+                </div>
+                
+                
+                
+                
+
+            </div>
+            <div class="w3-col l1"> &nbsp </div>
+        </div>
+    </div>
+
+
+    <!-- script frame -->
+    <script src="../js/lib/vue/dist/vue.js"></script>
+    <script src="../js/lib/axios/dist/axios.min.js"></script>
+    <script src="../js/lib/moment/min/moment.min.js"></script>
+    <script src="../js/components/layouts/header.js"></script>
+    <script src="../js/lib/lodash/lodash.js"></script>
+    
+
+    <script src="../js/components/reports/reportsTable.js"></script>
+
+    <script src="../js/instances/reports.js"></script>
+    <script src="../css/lib/bulma-modal-fx-1.1.0/dist/js/modal-fx.min.js"></script>
+
+    
+</body>
+
+</html>

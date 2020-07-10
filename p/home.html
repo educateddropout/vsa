@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Validation Search App - Home</title>
+
+    <link rel="stylesheet" href="../css/lib/fontawesome-free/css/all.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/w3css/v4/w3.css">
+    <link rel="stylesheet" type="text/css" href="../css/specific/ad.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-modal-fx-1.1.0/dist/css/modal-fx.min.css"> 
+    
+</head>
+<style type="text/css">
+    .pointer {cursor: pointer;}
+    .upperCase { text-transform:uppercase;}
+</style>
+<body>
+    
+    <div id="home">
+        
+        <header-nav
+            :page-counter= "pageCounter"
+            @copy-user-data = "copyUserData"
+        ></header-nav>
+
+        <br>
+        <div class="w3-row">
+            <div class="w3-col l1"> &nbsp </div>
+            <div class="w3-col l10">
+
+                
+
+                <div class="modal" :class="{'is-active' : showLoadingModal }">
+                    <div class="modal-background"></div>
+                    <div class="modal-content">
+                        <div class="box">
+                            <br>
+                            <div class="w3-row">
+                                <progress class="progress" :class="loadingColor" :value="count" max="100">{{count}}%</progress>
+                                <p v-if="count < 100" >Searching... Please wait! {{count}}%</p>
+                                <p v-else="" >
+                                    <span class="has-text-success" v-if="searchNamesList.length > 0">{{count}}% Success...</span>
+                                    <span class="has-text-danger" v-else="">{{count}}% No Result Found!..</span>
+                                </p>
+                            </div>
+                            <br>
+                            <div class="w3-row">
+                                <button class="button is-outlined is-pulled-right"  @click="hideLoadingModal" :disabled="count < 100">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="modal-close is-large" aria-label="close" @click="hideLoadingModal" :disabled="count < 100"></button>
+                </div>
+                <section class="box is-paddingless">
+                    
+                    <div class="hero-body">
+                        <div class="container w3-row">
+                                
+                                <div class="w3-row w3-container">
+                                    <label class="label is-size-4"> Search <i class="fas fa-search"></i> </label>
+                                </div>
+                                <div class="w3-row">
+                                    <div class="w3-col l11">
+                                        <div class="w3-row-padding">
+                                            <div class="w3-third">
+                                                <input class="input upperCase" type="text" v-model="search.firstName.value" :class="{ 'is-danger' : search.firstName.error != ''}" >
+                                                <p class="help" :class="{ 'is-danger' : search.firstName.error != ''}">First Name</p>
+                                                <p class="help is-danger">{{ search.firstName.error }}</p>
+                                            </div>
+                                            <div class="w3-third">
+                                                <input class="input upperCase" type="text" v-model="search.middleName.value"   :class="{ 'is-danger' : search.middleName.error != ''}">
+                                                <p class="help" :class="{ 'is-danger' : search.middleName.error != ''}">Middle Name</p>
+                                                <p class="help is-danger">{{ search.middleName.error }}</p>
+                                            </div>
+                                            <div class="w3-third">
+                                                <input class="input upperCase" type="text" v-model="search.lastName.value"  :class="{ 'is-danger' : search.lastName.error != ''}">
+                                                <p class="help" :class="{ 'is-danger' : search.lastName.error != ''}">Last Name</p>
+                                                <p class="help is-danger">{{ search.lastName.error }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w3-col l1 w3-right">
+                                        <button class="button is-link is-outlined" @click="searchNames"> <i class="fas fa-search"></i> </button>
+                                    </div>
+                                </div>
+
+
+                        </div>
+                    </div>
+                </section>
+                <br>
+                
+                <!-- <section class="box is-paddingless" v-show="searchNamesList.length > 0"> -->
+                <section class="box is-paddingless" >
+                    
+                    <div class="hero-body">
+                        <div class="container w3-row">
+                            <p class="has-text-link  " ><span class="pointer" @click="openComplaintFormModal"><u>Proceed to Complaint Form</u></span></p>
+                            <table class="table is-fullwidth is-hoverable is-striped w3-border w3-round " v-show="searchNamesList.length > 0">
+                                <thead class="w3-dark-grey">
+                                    <tr>
+                                        <th class=" has-text-white-bis ">#</th>
+                                        <th class=" has-text-white-bis ">First Name</th>
+                                        <th class=" has-text-white-bis ">Middle Name</th>
+                                        <th class=" has-text-white-bis ">Last Name</th>
+                                        <th class=" has-text-white-bis ">Ext Name</th>
+                                        <th class=" has-text-white-bis ">Sex</th>
+                                        <th class=" has-text-white-bis ">Birthday</th>
+                                        <th class=" has-text-white-bis "><abbr title="Household ID">HHID</abbr></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="list,index in searchNamesList">
+                                        <td>{{index+1}}</td>
+                                        <td>{{list.first_name}}</td>
+                                        <td>{{list.middle_name}}</td>
+                                        <td>{{list.last_name}}</td>
+                                        <td>{{list.ext_name}}</td>
+                                        <td>{{list.sex}}</td>
+                                        <td>{{list.birthdate}}</td>
+                                        <td class="has-text-link pointer" @click="viewHouseholdDetail(list.hh_id)"><u>{{list.hh_id}}</u></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                
+                <div id="modal-id" class="modal modal-fx-slideRight modal-full-screen"  :class="{ 'is-active' : showComplaintFormModal}" >
+                    <div class="modal-content modal-card">
+                        <header class="modal-card-head">
+                            <p class="modal-card-title"><i class="fas fa-scroll"></i> &nbspGeneral Information Form </p>
+                            <button class=" delete" @click="hideComplaintFormModal"></button>
+                        </header>
+                        <section class="modal-card-body">
+                            
+                            
+                            <div class="hero-body">
+                                <div class="container w3-row">
+                                        
+                                    <div class="w3-row w3-container">
+                                        <label class="label is-size-4">Complainant Name</label>
+                                    </div>
+                                    <div class="w3-row-padding">
+                                        <div class="w3-quarter">
+                                            <input class="input upperCase" :class="{'is-danger':generalInfo.firstName.error !== ''}"
+                                                type="text" v-model="generalInfo.firstName.value" 
+                                                name="firstName" maxlength="60"
+                                                @blur="validateFirstName"
+                                            >
+                                            <p class="help" :class="{'is-danger':generalInfo.firstName.error !== ''}">First Name</p>
+                                            <p class="help is-danger">{{generalInfo.firstName.error}}</p>
+                                        </div>
+                                        <div class="w3-quarter">
+                                            <input class="input upperCase" :class="{'is-danger':generalInfo.middleName.error !== ''}"
+                                                type="text" v-model="generalInfo.middleName.value"
+                                                name="middleName" maxlength="60"
+                                                @blur="validateMiddleName"
+                                            >
+                                            <p class="help" :class="{'is-danger':generalInfo.middleName.error !== ''}">Middle Name</p>
+                                            <p class="help is-danger">{{generalInfo.middleName.error}}</p>
+                                        </div>
+                                        <div class="w3-quarter">
+                                            <input class="input upperCase" :class="{'is-danger':generalInfo.lastName.error !== ''}"
+                                                type="text" v-model="generalInfo.lastName.value" 
+                                                name="lastName" maxlength="60"
+                                                @blur="validateLastName"
+                                            >
+                                            <p class="help" :class="{'is-danger':generalInfo.lastName.error !== ''}">Last Name</p>
+                                            <p class="help is-danger">{{generalInfo.lastName.error}}</p>
+                                        </div>
+                                        <div class="w3-quarter">
+                                            <div class="select is-fullwidth">
+                                                <select v-model="generalInfo.region.value" @change="changeRegion">
+                                                    <option v-for="extName in libExtensionNames" :value="extName.label">{{extName.value}}</option>
+                                                </select>
+                                            </div>
+                                            <p class="help">Ext Name</p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                
+                                <br>
+                                <br>
+                                <div class="container w3-row">
+                                        
+                                        <div class="w3-row w3-container">
+                                            <label class="label is-size-4">Address</label>
+                                        </div>
+                                        <div class="w3-row-padding">
+                                            <div class="w3-quarter">
+                                                <div class="select is-fullwidth" :class="{'is-danger': generalInfo.region.error !== ''}">
+                                                    <select v-model="generalInfo.region.value" @change="changeRegion" @blur="validateRegion">
+                                                        <option :value='-1'>Select dropdown</option>
+                                                        <option v-for="region in libRegions" :value="region.region_code">{{region.region_name}}</option>
+                                                    </select>
+                                                </div>
+                                                <p class="help" :class="{'is-danger': generalInfo.region.error !== ''}">Region</p>
+                                                <p class="help is-danger">{{generalInfo.region.error}}</p>
+                                            </div>
+                                            <div class="w3-quarter">
+                                                <div class="select is-fullwidth" :class="{'is-danger': generalInfo.province.error !== ''}">
+                                                    <select v-model="generalInfo.province.value" @change="changeProvince" @blur="validateProvince">
+                                                        <option :value='-1'>Select dropdown</option>
+                                                        <option v-for="province in libProvinces" :value="province.province_code">{{province.province_name}}</option>
+                                                    </select>
+                                                </div>
+                                                <p class="help" :class="{'is-danger': generalInfo.province.error !== ''}">Province</p>
+                                                <p class="help is-danger">{{generalInfo.province.error}}</p>
+                                            </div>
+                                            <div class="w3-quarter">
+                                                <div class="select is-fullwidth" :class="{'is-danger': generalInfo.city.error !== ''}">
+                                                    <select v-model="generalInfo.city.value" @change="changeCity" @blur="validateCity">
+                                                        <option :value='-1'>Select dropdown</option>
+                                                        <option v-for="city in libCities" :value="city.city_code">{{city.city_name}}</option>
+                                                    </select>
+                                                </div>
+                                                <p class="help" :class="{'is-danger': generalInfo.city.error !== ''}">City</p>
+                                                <p class="help is-danger">{{generalInfo.city.error}}</p>
+                                            </div>
+                                            <div class="w3-quarter">
+                                                <div class="select is-fullwidth" :class="{'is-danger': generalInfo.barangay.error !== ''}">
+                                                    <select v-model="generalInfo.barangay.value" @blur="validateBarangay">
+                                                        <option :value='-1'>Select dropdown</option>
+                                                        <option v-for="barangay in libBarangay" :value="barangay.barangay_code">{{barangay.barangay_name}}</option>
+                                                    </select>
+                                                </div>
+                                                <p class="help" :class="{'is-danger': generalInfo.barangay.error !== ''}">Barangay</p>
+                                                <p class="help is-danger">{{generalInfo.barangay.error}}</p>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="w3-row-padding">
+                                            <div class="w3-half">
+                                                 <div class="w3-row is-fullwidth">
+                                                    <textarea class="textarea upperCase" :class="{'is-danger':generalInfo.purokSitio.error !== ''}"
+                                                        v-model="generalInfo.purokSitio.value" rows="3" @blur="validatePurokSitio"
+                                                    ></textarea>
+                                                </div>
+                                                <p class="help" :class="{'is-danger':generalInfo.purokSitio.error !== ''}">Purok/Sitio</p>
+                                                <p class="help is-danger">{{generalInfo.purokSitio.error}}</p>
+                                            </div>
+                                            <div class="w3-half">
+                                                <div class="w3-row is-fullwidth">
+                                                    <textarea class="textarea upperCase" :class="{'is-danger':generalInfo.streetAddress.error !== ''}"
+                                                        v-model="generalInfo.streetAddress.value" @blur="validateStreetAddress"
+                                                        rows="3"
+                                                    ></textarea>
+                                                </div>
+                                                <p class="help" :class="{'is-danger':generalInfo.streetAddress.error !== ''}">Street Address</p>
+                                                <p class="help is-danger">{{generalInfo.streetAddress.error}}</p>
+                                            </div>
+                                        </div>
+                                </div>
+                                
+                                <br>
+                                <br>
+                                <div class="container w3-row">
+                                        
+                                    <div class="w3-row-padding">
+                                        <div class="w3-quarter">
+                                            <label><strong>Sex</strong></label>
+                                            <div class="select is-fullwidth" :class="{'is-danger':generalInfo.sex.error !== ''}">
+                                                <select v-model="generalInfo.sex.value" @blur="validateSex">
+                                                    <option value="-1" disabled>Please select</option>
+                                                    <option value="1">Male</option>
+                                                    <option value="2">Female</option>
+                                                </select>
+                                                <p class="help is-danger">{{generalInfo.sex.error}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="w3-quarter">
+                                            <label><strong>Date Of Birth</strong></label>
+                                            <div class="w3-row">
+                                                <div class="w3-col l3">
+                                                    <input class="input " type="text" v-model="generalInfo.dateOfBirthMM.value" maxlength="2">
+                                                    <p class="help">MM</p>
+                                                </div>
+                                                <div class="w3-col l1">&nbsp</div>
+                                                <div class="w3-col l3">
+                                                    <input class="input" type="text" v-model="generalInfo.dateOfBirthDD.value" maxlength="2">
+                                                    <p class="help">DD</p>
+                                                </div>
+                                                <div class="w3-col l1">&nbsp</div>
+                                                <div class="w3-col l4">
+                                                    <input class="input" type="text" v-model="generalInfo.dateOfBirthYYYY.value" maxlength="4">
+                                                    <p class="help">YYYY</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="w3-quarter">
+                                            <label><strong>Contact Number</strong></label>
+                                            <input class="input" :class="{'is-danger':generalInfo.contactNumber.error !== ''}" type="text" v-model="generalInfo.contactNumber.value" name="contactNumber" maxlength="11">
+                                            <p class="help is-danger">{{generalInfo.contactNumber.error}}</p>
+                                        </div>
+                                        <div class="w3-quarter">
+                                            <label><strong>Email Address(Optional)</strong></label>
+                                            <input class="input" type="text" v-model="generalInfo.emailAddress.value" name="emailAddress" maxlength="60">
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <br>
+                                <br>
+                                <div class="container w3-row">
+                                        
+                                    <div class="w3-row-padding">
+                                        <div class="w3-quarter">
+                                            <label><strong>ID Presented</strong></label>
+                                            <div class="select is-fullwidth" :class="{'is-danger':generalInfo.idPresented.error !== ''}">
+                                                <select v-model="generalInfo.idPresented.value" @blur="validateIdPresented">
+                                                    <option value="-1" disabled>Please select</option>
+                                                    <option value="1">Barangay ID</option>
+                                                    <option value="2">National ID</option>
+                                                    <option value="3">UMID</option>
+                                                    <option value="4">Police Clearance</option>
+                                                    <option value="5">Birth Certification</option>
+                                                </select>
+                                                <p class="help is-danger">{{generalInfo.idPresented.error}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="w3-quarter">
+                                            <label><strong>Complaint Type</strong></label>
+                                            <div class="select is-fullwidth" :class="{'is-danger':generalInfo.typeOfComplaint.error !== ''}">
+                                                <select v-model="generalInfo.typeOfComplaint.value"  @blur="validateComplaint" @change="changeComplaint">
+                                                    <option value="-1" disabled>Please select</option>
+                                                    <option value="1" :disabled="generalInfo.selectedHHID.value != ''">General Inquiry</option>
+                                                    <option value="2" :disabled="generalInfo.selectedHHID.value == '' || householdDetail.poor == '1'">Ex 01  - Not on the list of Poor</option>
+                                                    <option value="3" :disabled="generalInfo.selectedHHID.value != ''">Ex 02  - Not assess</option>
+                                                    <option value="4" :disabled="generalInfo.selectedHHID.value == '' || householdDetail.poor == '0'">Inc 01 - Included in the list of Poor</option>
+                                                    <option value="5" :disabled="generalInfo.selectedHHID.value == ''">Er 01  - Misspelled Name</option>
+                                                </select>
+                                                <p class="help is-danger">{{generalInfo.typeOfComplaint.error}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="w3-quarter"> &nbsp
+                                        </div>
+                                        <div class="w3-quarter">
+                                            <label><strong>Household ID Selected:</strong></label>
+                                            <p class="w3-text-blue">{{generalInfo.selectedHHID.value}}</p>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <br>
+                                <br>
+                                <div class="container w3-row">
+                                    <div class="w3-row-padding w3-container">
+                                        <span v-if="generalInfo.typeOfComplaint.value != 5"><button class="button is-info is-outlined w3-right" @click="saveComplaintDetails"> <i class="fas fa-save"></i> &nbsp Save </button></span>
+                                        <span v-else=""><button class="button is-success is-outlined w3-right" @click="editRosterName"> <i class="fas fa-arrow-circle-right"></i> &nbsp Next </button></span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </section>
+                        <footer class="modal-card-foot">
+                            <button class="button is-danger" @click="hideComplaintFormModal">Cancel</button>
+                        </footer>
+                    </div>
+                </div>
+                
+                <div id="modal-id" class="modal modal-fx-slideRight modal-full-screen"  :class="{ 'is-active' : showHouseholdModal}" >
+                    <div class="modal-content modal-card">
+                        <header class="modal-card-head">
+                            <p class="modal-card-title">Household Details</p>
+                            <button class=" delete" @click="hideHouseholdDetail"></button>
+                        </header>
+                        <section class="modal-card-body">
+                            <div class="w3-row">
+                                <div class="w3-col l1" >&nbsp</div>
+                                <div class="w3-col l10">
+                                    <div class="w3-row w3-container">
+                                        <div class="w3-row">
+                                            <p><label><strong> Household ID :</strong></label> {{householdDetail.hh_id}}</p>
+                                            <p>
+                                                <label><strong> Address :</strong></label> 
+                                                    <span>{{householdDetail.region_name}}</span>
+                                                    <span>, {{householdDetail.province_name}}</span>
+                                                    <span>, {{householdDetail.city_name}}</span>
+                                                    <span>, {{householdDetail.barangay_name}}</span>
+                                                    <span v-if="householdDetail.purok_sitio != ''">, {{householdDetail.purok_sitio}}</span>
+                                                    <span v-if="householdDetail.street_address != ''">, {{householdDetail.street_address}}</span>
+                                            </p>
+                                            <p>
+                                                <label><strong> Classification Status :</strong></label> 
+                                                <span v-if="householdDetail.poor == 1" class="has-text-danger">POOR</span>
+                                                <span v-else="" class="has-text-success">NON-POOR</span>
+                                            </p>
+                                        </div>
+                                        <br>
+                                        <div class="w3-row">
+                                            <table class="table is-fullwidth is-hoverable is-striped w3-border w3-round ">
+                                                <thead>
+                                                    <tr>
+                                                        <th colspan="8">Household Roster Detail</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th >#</th>
+                                                        <th >First Name</th>
+                                                        <th >Middle Name</th>
+                                                        <th >Last Name</th>
+                                                        <th >Ext Name</th>
+                                                        <th >Sex</th>
+                                                        <th >Birthday</th>
+                                                        <th ><abbr title="Relationship to Household Head">Rel HH</abbr></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="roster,index in householdRoster">
+                                                        <td>{{index+1}}</td>
+                                                        <td>{{roster.first_name}}</td>
+                                                        <td>{{roster.middle_name}}</td>
+                                                        <td>{{roster.last_name}}</td>
+                                                        <td>{{roster.ext_name}}</td>
+                                                        <td>{{roster.sex}}</td>
+                                                        <td>{{roster.birthdate}}</td>
+                                                        <td>{{defineRelHH(roster.rel_hh)}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w3-col l1" >&nbsp</div>
+                            </div>
+                        </section>
+                        <footer class="modal-card-foot">
+                            <button class="button is-success" @click="selectHHID">Select</button>
+                            <button class="button is-danger" @click="hideHouseholdDetail">Cancel</button>
+                        </footer>
+                    </div>
+                </div>
+
+                
+
+            </div>
+            <div class="w3-col l1"> &nbsp </div>
+        </div>
+    </div>
+
+
+    <!-- script frame -->
+    <script src="../js/lib/vue/dist/vue.js"></script>
+    <script src="../js/lib/axios/dist/axios.min.js"></script>
+    <script src="../js/lib/moment/min/moment.min.js"></script>
+    <script src="../js/components/layouts/header.js"></script>
+    <script src="../js/instances/home.js"></script>
+    <script src="../css/lib/bulma-modal-fx-1.1.0/dist/js/modal-fx.min.js"></script>
+
+    <script src="../js/scripts/complaintFormValidationRoutine.js"></script>
+    
+</body>
+
+</html>

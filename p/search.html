@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Validation Search App - Grievance Page</title>
+
+    <link rel="stylesheet" href="../css/lib/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/w3css/v4/w3.css">
+    <link rel="stylesheet" type="text/css" href="../css/specific/sac.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-modal-fx-1.1.0/dist/css/modal-fx.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-steps/dist/css/bulma-steps.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-divider/dist/css/bulma-divider.min.css"> 
+    
+</head>
+<style type="text/css">
+    [v-cloak] {
+      display: none;
+    }
+</style>
+<body >
+    
+    <div id="search" v-cloak>
+        
+        <header-nav
+            :page-counter= "pageCounter"
+            @copy-user-data = "copyUserData"
+        ></header-nav>
+        
+        <div class="w3-row">
+            <div class="w3-col l2"> &nbsp </div>
+            <div class="w3-col l8">
+                
+                <br>
+                <div v-if="stepCounter == 1">
+                    <select-barangay-area
+                        ref = "selectBarangayArea"
+                        :is-show = "showSelectBarangayArea"
+                        :user-data = "userData"
+                        :lib-regions = "libRegions"
+                        :lib-provinces = "libProvinces"
+                        :lib-cities = "libCities"
+                        :lib-barangay = "libBarangay"
+                        :area-assignment = "areaAssignment"
+
+                        @select-area-assigned = "selectAreaAssigned"
+                        @fetch-lib-cities = "fetchLibCities"
+                        @fetch-lib-barangay = "fetchLibBarangay"
+                        
+                    ></select-barangay-area>
+
+                    <div class="w3-row w3-center">
+                        <span @click="showAreaAssignedSelection" class="pointer"><strong>{{areaAssignedLabel}}</strong></span>
+                    </div>
+                    <br>
+                    <name-requirements
+                        :general-info = "generalInfo"
+
+                        @move-to-search = "moveToSearch"
+                    >
+                    </name-requirements>
+
+                </div>
+                
+                <div v-else-if="stepCounter == 2">
+
+                    <loading-modal
+                        :search-names-list = "searchNamesList"
+                        :count = "count"
+                        :is-show-loading-modal = "isShowLoadingModal"
+
+                        @close = "hideLoadingModal"
+                    >
+                    </loading-modal>
+                    
+                    <div class="w3-row">
+                        <button class="button is-info w3-right is-medium" :disabled="!hasSelectedMatch || listOfSearchedNames == 0" @click="moveToComplaintForm">Go to Complaint Form</button>
+                    </div>
+                    <br>
+
+                    <div class="w3-row box">
+                        
+                        <search-section
+                            :search-data = "search"
+                            :is-show-loading-modal = "isShowLoadingModal"
+                            :has-selected-match =  "hasSelectedMatch"
+                            :list-of-searched-names = "listOfSearchedNames"
+
+                            @search-names = "searchNames"
+                        >
+                        </search-section>
+                        
+                        <strong><div class="is-divider" data-content="List of Searched Names"></div></strong>
+                        
+                        <searched-list
+                            :list-of-searched-names = "listOfSearchedNames"
+                            :has-selected-match =  "hasSelectedMatch"
+                        >
+                        </searched-list>
+
+                        <div v-show="listOfSearchedNames.length != 0">
+
+                            <strong><div class="is-divider" data-content="Search Result"></div></strong>
+                            
+                            <search-list-div
+                                :has-selected-match =  "hasSelectedMatch"
+                                :search-names-list = "searchNamesList"
+                                @get-household-detail = "getHouseholdDetail"
+                                @no-match-household = "noMatchHousehold"
+                            >   
+                            </search-list-div>
+
+                        </div>
+
+                        <household-profile-modal
+                            :is-show-household-detail-modal = "isShowHouseholdDetailModal"
+                            :household-detail = "householdDetail"
+                            :household-roster = "householdRoster"
+
+                            @close = "hideHouseholdDetail"
+                            @match-household = "matchHousehold"
+                        >
+                        </household-profile-modal>
+
+
+                    </div>
+
+                </div>
+                
+                <div v-else-if="stepCounter == 3">
+
+                    <complaint-form
+
+                        :general-info = "generalInfo"
+                        :list-of-searched-names = "listOfSearchedNames"
+                        :lib-regions = "libRegions"
+                        :lib-provinces = "libProvinces"
+                        :lib-cities = "libCities"
+                        :lib-barangay = "libBarangay"
+
+                        @reset-page = "resetPage"
+                        @toggle-step-footer = "toggleStepFooter"
+
+                    ></complaint-form>
+                
+                </div>
+                
+
+                <br><br><br><br><br><br><br><br><br>
+
+            </div>
+            <div class="w3-col l2">
+                <div class="w3-row w3-border-left " style="height: 90vh; overflow-y: auto;" v-show="stepCounter == 1">
+                    <div class="w3-row" >
+                        <br>
+                        <div class="w3-row w3-container has-text-link is-size-5">
+                            <b>Grievance History</b>
+                        </div>
+                        <div class="is-divider"></div>
+                        
+                        <div class="w3-row w3-container" v-for="g in grievanceList">
+                            <span class="has-text-info">{{g.uuid}}</span>
+                            <p><b>{{complainantName(g.first_name, g.middle_name, g.last_name, g.ext_name)}}</b></p>
+                            <p>Grievance Type: {{grievanceType(g.complaint_type)}}</p>
+                            <div class="is-divider"></div>
+                        </div>
+                        <br>
+                        <br>
+                    </div>
+                </div>
+                &nbsp 
+             </div>
+        </div>
+        
+        <grievance-steps
+            :step-counter = "stepCounter"
+            :is-show-step-footer = "isShowStepFooter"
+
+            @move-to-step="moveToStep"
+        >
+        </grievance-steps>
+
+    </div>
+
+
+    <!-- script frame -->
+    <script src="../js/lib/vue/dist/vue.js"></script>
+    <script src="../js/lib/axios/dist/axios.min.js"></script>
+    <script src="../js/lib/moment/min/moment.min.js"></script>
+    <script src="../js/components/layouts/header.js"></script>
+    <script src="../js/lib/lodash/lodash.js"></script>
+    
+    <script src="../js/components/search/selectBarangayArea.js"></script>
+    <script src="../js/components/search/grievanceSteps.js"></script>
+    <script src="../js/components/search/nameRequirements.js"></script>
+    <script src="../js/components/search/loadingModal.js"></script>
+    <script src="../js/components/search/searchSection.js"></script>
+    <script src="../js/components/search/searchedList.js"></script>
+    <script src="../js/components/search/searchListDiv.js"></script>
+    <script src="../js/components/search/householdProfileModal.js"></script>
+    <script src="../js/components/search/complaintForm.js"></script>
+    <script src="../js/components/search/grievanceTypeHelper.js"></script>
+    <script src="../js/components/search/matchedHouseholdIds.js"></script>
+    <script src="../js/components/search/divTr08View.js"></script>
+    <script src="../js/components/search/divEr01View.js"></script>
+    <script src="../js/components/search/divEr03View.js"></script>
+    <script src="../js/components/search/rosterForm.js"></script>
+    <script src="../js/components/search/rosterForm/familyRosterInputOccupation.js"></script>
+    <script src="../js/components/search/rosterForm/familyRosterInput.js"></script>
+    <script src="../js/components/search/familyRosterDivSelect.js"></script>
+    <script src="../js/scripts/complaintFormValidationRoutine.js"></script>
+    <script src="../js/scripts/familyRosterSelection.js"></script>
+    <script src="../js/scripts/rosterFormValidationRoutine.js"></script>
+    <script src="../js/scripts/commonLib.js"></script>
+
+    <script src="../js/instances/search.js"></script>
+    <script src="../css/lib/bulma-modal-fx-1.1.0/dist/js/modal-fx.min.js"></script>
+
+    
+    
+</body>
+
+</html>
