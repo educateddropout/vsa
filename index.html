@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Validation Search Application - Login</title>
+    
+    <link rel="shortcut icon" type="iamge/png" href="assets/images/relief.png">
+    <link rel="stylesheet" href="css/lib/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="css/lib/bulma/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="css/specific/login.css">
+    <link rel="stylesheet" type="text/css" href="css/specific/sac.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/w3css/v4/w3.css">
+</head>
+<body >
+    <div id="login" v-cloak>
+    
+        <!-- Sidebar with image -->
+        <nav class="w3-sidebar w3-hide-medium w3-hide-small " style="width:60%">
+            <div class="w3-row  has-background-white">
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <div class="w3-row has-text-centered">
+                    <img src="assets/images/dswd.jpg" width="180" height="100">
+                    <img src="assets/images/Listahanan-2copy.png" width="200" height="120">
+                </div>
+                <br>
+            </div>
+            <div class="w3-row ">
+                <br>
+                <br>
+                <br>
+                <div class="w3-row">
+                    <div class="w3-col l2">&nbsp</div>
+                    <div class="w3-col l8">
+                        <h1 class="title w3-text-danger">
+                            Listahanan 3 Validation Search Application
+                        </h1>
+                        <br>
+                        <h2 class="subtitle has-text-grey-dark" style="text-align: justify; text-justify: inter-word;">
+                            An offline information system used for Listahanan 3 Validation and Finalization phase which provides an opportunity
+                            for the community and the local government units to review the initial list of poor households generated after the initial application of the proxy means test (PMT) for transparency. 
+                    </div>
+                    <div class="w3-col l2">&nbsp</div>
+                    
+                    
+                </div>
+                
+                <br>
+                <br>
+                <br>
+                <div class="w3-row w3-container">
+                    <div class="w3-col l2">&nbsp</div>
+                    <div class="w3-col l8 " >
+                            <div class="w3-row">
+                                <div class="w3-half">
+                                    <div class="w3-container">
+                                        <p class="title is-6 has-text-grey w3-padding">Important <i class="fas fa-exclamation"></i></p>
+                                        <h2 class="subtitle is-6 has-text-dark w3-padding" style="text-align: justify; text-justify: inter-word;">
+                                            Only Area Supervisors should access the system.
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div class="w3-half">
+                                    <div class="w3-container">
+                                        <p class="title is-6 has-text-grey w3-padding">Technical Support <i class="fas fa-phone-square"></i></p>
+                                        <h2 class="subtitle is-6 has-text-dark w3-padding" >
+                                            For assistance, call <span class="has-text-link">09991111111</span>
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="w3-col l2">&nbsp</div>
+                </div>
+            </div>
+
+            
+        </nav>
+
+        <!-- Page Content -->
+        <div class="w3-main w3-padding-large " style="margin-left:60%; ">
+            <div class="w3-row">
+                <div class="w3-col l2">&nbsp</div>
+                <div class="w3-col l8">
+                    
+                    
+                        
+                    <div class="box is-paddingless"  style="margin-top:60%; ">
+                        
+                        <div class="w3-row w3-container w3-padding-large">
+                            <br>
+                            <div class="w3-row" v-if="loginErrorMessage != ''">
+                                <article class="message"  :class="{'is-info': loginErrorMessage == '', 'is-danger' : loginErrorMessage != ''}">
+                                    <div class="message-body">
+                                        {{loginErrorMessage}}<span v-if="loginLoading"><i class="fas fa-sync fa-spin"></i></span>
+                                    </div>
+                                </article>
+                            </div>
+                            <div class="w3-row" v-else="">
+                                <br>
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Username</label>
+                                <div class="control has-icons-left has-icons-right ">
+                                    <input class="input is-fullwidth is-medium" type="text" autofocus="" v-model="username" @change="changeUsername" 
+                                        :class="{'is-danger': usernameError != ''}"
+                                    >
+                                    <span class="icon is-small is-left">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                </div>
+                                <p class="help is-danger">{{usernameError}}</p>
+                                
+                            </div>
+                            <br>
+                            <div class="field">
+                                <label class="label">Password</label>
+                                <div class="control has-icons-left has-icons-right">
+                                    <input class="input is-medium" type="password" v-model="password" @keyup.enter="onSubmit" @change="changePassword"
+                                        :class="{'is-danger': passwordError != ''}"
+                                    >
+                                    <span class="icon is-small is-left">
+                                        <i class="fas fa-key"></i>
+                                    </span>
+                                </div>
+                                <p class="help is-danger">{{passwordError}}</p>
+                            </div>
+                            <br>
+                            
+
+                        </div>
+                        <div class="w3-row w3-border-top has-background-white-ter w3-padding">
+                            <button class="button is-link w3-right" @click="onSubmit" :disabled="loginLoading">Sign In &nbsp<span v-if="loginLoading"><i class="fas fa-spinner fa-pulse"></i></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="w3-col l2">&nbsp</div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- script frame -->
+    <script src="js/conf/constants_config.js"></script>
+    <script src="js/lib/vue/dist/vue.js"></script>
+    <script src="js/lib/axios/dist/axios.min.js"></script>
+    <script src="js/instances/login.js"></script>
+
+</body>
+
+</html>
