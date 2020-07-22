@@ -370,7 +370,7 @@ Vue.component('divEr01View', {
                     this.householdRoster[this.selectedRoster].extName.value = this.rosterToUpdate.extName.value;
                     this.householdRoster[this.selectedRoster].sex.value = this.rosterToUpdate.sex.value;
 
-                    this.householdRoster[this.selectedRoster].addCtr = 3; //updated
+                    this.householdRoster[this.selectedRoster].archive = 2; //updated
 
                     this.showRosterUpdateModal = false;
             }

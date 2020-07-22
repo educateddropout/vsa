@@ -25,7 +25,7 @@ class QueryBuilder
 		if($data['firstName'] === "" && $data['middleName']  === ""){
 
 			$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster_caraga
+												FROM tbl_family_roster
 												WHERE last_name = :lastName");
 
 			$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
@@ -35,7 +35,7 @@ class QueryBuilder
 			if($statement->rowCount() === 0){
 				$lastName = $data['lastName']."%";
 				$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster_caraga
+												FROM tbl_family_roster
 												WHERE last_name like :lastName");
 
 				$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
@@ -45,7 +45,7 @@ class QueryBuilder
 		} else if($data['firstName'] !== "" && $data['middleName']  === ""){
 			
 			$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster_caraga
+												FROM tbl_family_roster
 												WHERE last_name = :lastName AND first_name = :firstName");
 
 			$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
@@ -58,7 +58,7 @@ class QueryBuilder
 				$firstName = $data['firstName']."%";
 
 				$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster_caraga
+												FROM tbl_family_roster
 												WHERE last_name like :lastName AND first_name like :firstName");
 
 				$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
@@ -68,7 +68,7 @@ class QueryBuilder
 
 		} else if($data['firstName'] === "" && $data['middleName']  !== ""){
 			$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster_caraga
+												FROM tbl_family_roster
 												WHERE last_name = :lastName AND middle_name = :middleName");
 
 			$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
@@ -81,7 +81,7 @@ class QueryBuilder
 				$middleName = $data['middleName']."%";
 
 				$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster_caraga
+												FROM tbl_family_roster
 												WHERE last_name like :lastName AND middle_name like :middleName");
 
 				$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
@@ -92,7 +92,7 @@ class QueryBuilder
 
 		} else if($data['firstName'] !== "" && $data['middleName']  !== ""){
 			$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster_caraga
+												FROM tbl_family_roster
 												WHERE last_name = :lastName AND first_name = :firstName AND middle_name = :middleName");
 
 			$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
@@ -107,7 +107,7 @@ class QueryBuilder
 				$middleName = $data['middleName']."%";
 
 				$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster_caraga
+												FROM tbl_family_roster
 												WHERE last_name like :lastName AND first_name like :firstName AND middle_name like :middleName");
 
 				$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
@@ -125,7 +125,7 @@ class QueryBuilder
 	public function fetchHouseholdDetail($data){
 
 		$statement = $this->pdo->prepare("SELECT th.hh_id, th.region_code, th.province_code, th.city_code, th.barangay_code, lr.region_name, lp.province_name, lc.city_name, lb.barangay_name, th.purok_sitio, th.street_address, th.type_of_hh, th.respondent, th.poor
-											FROM tbl_household_caraga th
+											FROM tbl_household th
 											INNER JOIN lib_regions lr ON th.region_code = lr.region_code
 											INNER JOIN lib_provinces lp ON th.province_code = lp.province_code
 											INNER JOIN lib_cities lc ON th.city_code = lc.city_code
@@ -160,7 +160,7 @@ class QueryBuilder
 												occupation_enumerator, occupation_area_supervisor, psoc, class_of_worker, basis_of_payment, nature_of_employment,
 												is_overseas, how_often, ofi, is_sending_money
 
-											FROM tbl_family_roster_caraga
+											FROM tbl_family_roster
 
 											WHERE hh_id = ?
 											ORDER BY rel_hh, last_name, first_name");
@@ -171,7 +171,7 @@ class QueryBuilder
 
 	}
 
-	public function fetchUnsync(){
+	public function fetchUnsync($userId){
 
 		$synced = 'N'; // not yet synced
 		$archive = 0; // active
@@ -181,10 +181,10 @@ class QueryBuilder
 											FROM tbl_grievance ct
 											INNER JOIN lib_brgy lb
 												ON ct.area_barangay_code = lb.barangay_code
-											WHERE is_sync = ? and archive = ?
+											WHERE is_sync = ? and archive = ? and last_modified_by = ?
 											ORDER BY last_modified");
 
-		$statement->execute([$synced, $archive]);
+		$statement->execute([$synced, $archive, $userId]);
 		
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -213,7 +213,7 @@ class QueryBuilder
 		if($grievanceType == 8){
 			
 			$statement = $this->pdo->prepare("SELECT barangay_code, region_code, province_code, city_code, purok_sitio, street_address, hh_id
-											FROM tbl_household_caraga
+											FROM tbl_household
 											WHERE hh_id = ?");
 
 			$statement->execute([$returnValue[0][0]['hh_id']]);
@@ -371,28 +371,33 @@ class QueryBuilder
 
 						foreach ($rosterDetail as $roster) {
 
-							$statement = $this->pdo->prepare("INSERT INTO tbl_g_family_roster 
-																(grievance_id, uuid, hh_id, last_name,
-																	first_name, middle_name, ext_name, birth_month, birth_day,
-																	birth_year, birthdate, assessment_age, sex, is_pregnant,
-																	marital_status, solo_parent, rel_hh, rel_fh, family_number,
-																	diff_see, diff_hear, diff_walk, diff_rem, diff_care,
-																	diff_com, is_attending_sch, hea, is_employed, occupation_enumerator,
-																	occupation_area_supervisor, psoc, class_of_worker, basis_of_payment, ofi,
-																	nature_of_employment, is_overseas, is_sending_money, how_often, last_modified,
-																	last_modified_by, is_update)
-																VALUES
-																(?, ?, ?, ?,
-																	?, ?, ?, ?, ?,
-																	?, ?, ?, ?, ?,
-																	?, ?, ?, ?, ?,
-																	?, ?, ?, ?, ?,
-																	?, ?, ?, ?, ?,
-																	?, ?, ?, ?, ?,
-																	?, ?, ?, ?, ?,
-																	?, ?)");
+							if($roster['archive'] != 1){
 
-							$statement->execute(saveRoster($roster, $complaintUuid, $householdDetail['hh_id'], $currentDate, $userId));
+								$statement = $this->pdo->prepare("INSERT INTO tbl_g_family_roster 
+																	(grievance_id, uuid, hh_id, last_name,
+																		first_name, middle_name, ext_name, birth_month, birth_day,
+																		birth_year, birthdate, assessment_age, sex, is_pregnant,
+																		marital_status, solo_parent, rel_hh, rel_fh, family_number,
+																		diff_see, diff_hear, diff_walk, diff_rem, diff_care,
+																		diff_com, is_attending_sch, hea, is_employed, occupation_enumerator,
+																		occupation_area_supervisor, psoc, class_of_worker, basis_of_payment, ofi,
+																		nature_of_employment, is_overseas, is_sending_money, how_often, last_modified,
+																		last_modified_by, is_update)
+																	VALUES
+																	(?, ?, ?, ?,
+																		?, ?, ?, ?, ?,
+																		?, ?, ?, ?, ?,
+																		?, ?, ?, ?, ?,
+																		?, ?, ?, ?, ?,
+																		?, ?, ?, ?, ?,
+																		?, ?, ?, ?, ?,
+																		?, ?, ?, ?, ?,
+																		?, ?)");
+
+								$statement->execute(saveRoster($roster, $complaintUuid, $householdDetail['hh_id'], $currentDate, $userId));
+
+							}
+
 
 						}
 
@@ -463,12 +468,12 @@ function guidv4($data = null)
 function saveRoster($roster, $complaintId, $householdId, $currentDate, $userId){
 
 	$rosterArray = array();
-	$uuid = $roster['id'];
+	$uuid = $roster['archive'] === '3' ? guidv4() : $roster['id'];
 	$hhid = $householdId;
 	$lastName = $roster['lastName']['value'];
-	$firstName = $roster['firstName']['value'];
-	$middleName = $roster['middleName']['value'];
-	$extName = $roster['extName']['value'];
+	$firstName = $roster['firstName']['value'] === '' ? null : $roster['firstName']['value'];
+	$middleName = $roster['middleName']['value'] === '' ? null : $roster['middleName']['value'];
+	$extName = $roster['extName']['value'] === '' ? null : $roster['extName']['value'];
 
 	if($roster['birthdayAge']['birthdayCheckbox'] == 1) {
 		$birthDay = $roster['birthdayAge']['birthDay']['value'];
@@ -502,9 +507,9 @@ function saveRoster($roster, $complaintId, $householdId, $currentDate, $userId){
     $caring = $roster['caring']['value'];
     $communicating = $roster['communicating']['value'];
     $employment = $roster['employment']['value'];
-    $occupationEnumerator = $roster['occupationEnumerator']['value'];
-    $occupationAreaSupervisor = $roster['occupationAreaSupervisor']['value'];
-    $psoc = $roster['psoc']['value'];
+    $occupationEnumerator = $roster['occupationEnumerator']['value'] === '' ? null : $roster['occupationEnumerator']['value'];
+    $occupationAreaSupervisor = $roster['occupationAreaSupervisor']['value'] === '' ? null : $roster['occupationAreaSupervisor']['value'];
+    $psoc = $roster['psoc']['value'] === '' ? null : $roster['psoc']['value'];
     $classOfWorker = $roster['classOfWorker']['value'];
     $basisOfPayment = $roster['basisOfPayment']['value'];
     $natureOfEmployment = $roster['natureOfEmployment']['value'];
@@ -512,7 +517,7 @@ function saveRoster($roster, $complaintId, $householdId, $currentDate, $userId){
     $ofi = $roster['ofi']['value'];
     $sendingMoney = $roster['sendingMoney']['value'];
     $howOften = $roster['howOften']['value'];
-    $isUpdated = $roster['addCtr'] == '1' ? 'N' : 'Y';
+    $isUpdated = $roster['archive'] == '0' ? 'N' : 'Y';
 
 	array_push($rosterArray, $complaintId, $uuid, $hhid, $lastName,
 				$firstName, $middleName, $extName, $birthMonth, $birthDay,

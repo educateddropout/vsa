@@ -6,7 +6,7 @@ function validateAttendingSchool(value, age){
 		msg = "This is required!";
 	}
 	else {
-		if(value == 1){
+		if(value == "Y"){
 			if(age < 3 || age > 50){
 				msg = "If attending school, age should be 3 to 50 years old.";
 			}
@@ -75,7 +75,6 @@ function validateYear(year, birthdayAgeIndicator){
 }
 
 function validateMonth(month,year){
-
 	let msg = "";
 
 	if(month != ""){
@@ -182,7 +181,7 @@ function validateSoloParent(soloParent, age, relHH, maritalStatus){
 	
 	if(soloParent == -1) msg = "This is required!";
 	else{
-		if(soloParent == 1){
+		if(soloParent == "Y"){
 			if(age !== "" && age < 8) msg = "Age should be 8 years old and above.";
 			else {
 				if(relHH == 1 && (maritalStatus == 2 || maritalStatus == 3 || maritalStatus == 7)){
@@ -197,7 +196,7 @@ function validateSoloParent(soloParent, age, relHH, maritalStatus){
 
 }
 
-function validateRelHH(relHH, age, householdHeadCount, maritalStatus){
+function validateRelHH(relHH, age, householdHeadCount, maritalStatus, selectedRelHh){
 
 	let msg = "";
 	
@@ -208,7 +207,7 @@ function validateRelHH(relHH, age, householdHeadCount, maritalStatus){
 
 			if(relHH == 1){
 				if(age < 18) msg = "Household head should be atleast 18 years old.";
-				else if(householdHeadCount != 0) msg = "There should be only 1 household head.";
+				else if(householdHeadCount != 0 && selectedRelHh != 1) msg = "There should be only 1 household head.";
 			} else if(relHH == 2) {
 
 				if(age < 8) msg = "Spouse should be atleast 8 years old.";
@@ -1048,20 +1047,20 @@ function validateHowOften(howOften, overseas, sendingMoney){
 
 		if(overseas == "Y"){
 			
-			if(sendingMoney == "Y"){
+			if(sendingMoney == 1){
 				if(howOften == 0) msg = "'SENDING MONEY' is yes. This cannot be skipped.";
 			}
 			else{
 				if(sendingMoney == -1) msg = "Please provide 'SENDING MONEY' (48. SM).";
 				else {
-					if(howOften != "S") msg = "if 'SENDING MONEY' is 'NO' or 'SKIPPED'. This should be skipped.";
+					if(howOften != 2) msg = "if 'SENDING MONEY' is 'NO' or 'SKIPPED'. This should be skipped.";
 				}
 			}
 			
 		} else if(overseas == "N"){
 
-			if(sendingMoney == "Y" || sendingMoney == "S"){
-				if(howOften != "S") msg = "if 'SENDING MONEY' is 'NO' or 'SKIPPED'. This should be skipped.";
+			if(sendingMoney == 1 || sendingMoney == 0){
+				if(howOften != 0) msg = "if 'SENDING MONEY' is 'NO' or 'SKIPPED'. This should be skipped.";
 			}
 
 		} else{
@@ -1082,26 +1081,26 @@ function validateHowOften(howOften, overseas, sendingMoney){
 function validateRosters(familyRosters, pageIndicator){
 
 	let msg = "";
-	let householdHead = familyRosters.filter(roster => roster.personalInformation.relHH.value == 1 && roster.archive == 0);
-	let hhFatherMother = familyRosters.filter(roster => roster.personalInformation.relHH.value == 7 && roster.archive == 0);
-	let notYetVerified = familyRosters.filter(roster => roster.verified == -1 && roster.archive == 0);
-	let familyHeads = familyRosters.filter(roster => roster.personalInformation.relFH.value == 1 && roster.archive == 0);
-	let familyRosterWithFN = familyRosters.filter(roster => roster.personalInformation.relFH.value != 0 && roster.archive == 0);
-	//let numberOfSoloParent = familyRosters.filter(roster => roster.personalInformation.soloParent.value == 1 && roster.archive == 0).length;
-	let soloParentHH = familyRosters.filter(roster => roster.personalInformation.soloParent.value == 1 && roster.archive == 0 && roster.personalInformation.relHH.value == 1).length;
+	let householdHead = familyRosters.filter(roster => roster.relHH.value == 1);
+	let hhFatherMother = familyRosters.filter(roster => roster.relHH.value == 7);
+	let notYetVerified = familyRosters.filter(roster => roster.verified == -1);
+	let familyHeads = familyRosters.filter(roster => roster.relFH.value == 1);
+	let familyRosterWithFN = familyRosters.filter(roster => roster.relFH.value != 0);
+	//let numberOfSoloParent = familyRosters.filter(roster => roster.soloParent.value == 1 && roster.archive == 0).length;
+	let soloParentHH = familyRosters.filter(roster => roster.soloParent.value == 1 && roster.relHH.value == 1).length;
 	let householdType = getHouseholdType(familyRosters);
 
 
     let uniqFamilyNumber = _.groupBy(familyRosterWithFN, function(roster) {
-    	return roster.personalInformation.familyNumber.value;
+    	return roster.familyNumber.value;
     });
 
     if(soloParentHH > 0){
     	
     	let numberOfMinor = familyRosters.filter(
-    		roster => roster.personalInformation.birthdayAge.age.value < 18 && roster.archive == 0 && 
-    		roster.personalInformation.maritalStatus.value == 1 &&
-    		(roster.personalInformation.relHH.value == 3 || roster.personalInformation.relHH.value == 6)
+    		roster => roster.birthdayAge.age.value < 18 && 
+    		roster.maritalStatus.value == 1 &&
+    		(roster.relHH.value == 3 || roster.relHH.value == 6)
     		
     	).length;
 
@@ -1115,10 +1114,10 @@ function validateRosters(familyRosters, pageIndicator){
 
     /*if(numberOfSoloParent > 0){
     	let numberOfMinor = familyRosters.filter(
-    		roster => roster.personalInformation.birthdayAge.age.value < 18 && roster.archive == 0 &&
-    		(roster.personalInformation.relHH.value == 3 || roster.personalInformation.relHH.value == 4 ||
-    			roster.personalInformation.relHH.value == 5 || roster.personalInformation.relHH.value == 6 ||
-    			roster.personalInformation.relHH.value == 8) && roster.personalInformation.soloParent.value != 1
+    		roster => roster.birthdayAge.age.value < 18 && roster.archive == 0 &&
+    		(roster.relHH.value == 3 || roster.relHH.value == 4 ||
+    			roster.relHH.value == 5 || roster.relHH.value == 6 ||
+    			roster.relHH.value == 8) && roster.soloParent.value != 1
     	).length;
 
     	if(numberOfMinor < 1){
@@ -1131,21 +1130,21 @@ function validateRosters(familyRosters, pageIndicator){
 	} else if(householdHead.length > 1) {
 		msg += "Found more than 1 household head. Please check! |";
 	} else {
-		let householdHeadAge = householdHead[0].personalInformation.birthdayAge.age.value;
+		let householdHeadAge = householdHead[0].birthdayAge.age.value;
 		
 		hhFatherMother.forEach(function(roster){
-			if(roster.personalInformation.relHH.value == 7){
-				hhFatherMotherDiffAge = roster.personalInformation.birthdayAge.age.value - householdHeadAge;
+			if(roster.relHH.value == 7){
+				hhFatherMotherDiffAge = roster.birthdayAge.age.value - householdHeadAge;
 				
 				if(hhFatherMotherDiffAge < 8){
-					if(roster.personalInformation.sex.value == 1){
-						msg += "Father " + roster.personalInformation.firstName.value + " " +
-							roster.personalInformation.middleName.value + " " +
-							roster.personalInformation.lastName.value + " . Should be 8 years older than household.";
+					if(roster.sex.value == 1){
+						msg += "Father " + roster.firstName.value + " " +
+							roster.middleName.value + " " +
+							roster.lastName.value + " . Should be 8 years older than household.";
 					} else {
-						msg += "Mother " + roster.personalInformation.firstName.value + " " +
-							roster.personalInformation.middleName.value + " " +
-							roster.personalInformation.lastName.value + " . Should be 8 years older than household.";
+						msg += "Mother " + roster.firstName.value + " " +
+							roster.middleName.value + " " +
+							roster.lastName.value + " . Should be 8 years older than household.";
 					}
 					
 				}
@@ -1170,17 +1169,17 @@ function validateRosters(familyRosters, pageIndicator){
 
 		families.forEach(function(roster){
 
-			if(roster.personalInformation.relFH.value == 1){
+			if(roster.relFH.value == 1){
 				familyHeadCount++;
 			}
 
-			familyNumber = roster.personalInformation.familyNumber.value;
+			familyNumber = roster.familyNumber.value;
 
-			if(roster.personalInformation.relHH.value == 2){
+			if(roster.relHH.value == 2){
 				spouseInFamily.push(roster);
 				familySpouseCount++;
 			}
-			else if(roster.personalInformation.relHH.value == 3){
+			else if(roster.relHH.value == 3){
 				anaksInFamily.push(roster);
 			}
 			
@@ -1195,7 +1194,7 @@ function validateRosters(familyRosters, pageIndicator){
 
 			anaksInFamily.forEach(function(roster){
 
-				if((spouseInFamily[0].personalInformation.birthdayAge.age.value-8) < roster.personalInformation.birthdayAge.age.value) 
+				if((spouseInFamily[0].birthdayAge.age.value-8) < roster.birthdayAge.age.value) 
 					masMatandangAnakCount++;
 
 			});
@@ -1227,143 +1226,6 @@ function validateRosters(familyRosters, pageIndicator){
 
 	return msg.trim();
 
-}
-
-function validateRoster(rosterData, currentMaxFn, householdHeadCount){
-
-    let retVal = false;
-    /**
-
-        -- function validateSelection only used to validate fields that no other validation beside REQUIRED
-        -- function validateSelection is at js/scripts/commonValidation Routines.js
-        -- others is at js/scripts/familyRosterValidationRoutines.js
-
-    */
-
-    let age = rosterData.personalInformation.birthdayAge.age.value;
-    let birthDay = rosterData.personalInformation.birthdayAge.birthDay.value;
-    let birthMonth = rosterData.personalInformation.birthdayAge.birthMonth.value;
-    let birthYear = rosterData.personalInformation.birthdayAge.birthYear.value;
-
-    let firstName = rosterData.personalInformation.firstName.value;
-    let middleName = rosterData.personalInformation.middleName.value;
-    let lastName = rosterData.personalInformation.lastName.value;
-
-    let sex = rosterData.personalInformation.sex.value;
-    let pregnant = rosterData.personalInformation.pregnant.value;
-    let maritalStatus = rosterData.personalInformation.maritalStatus.value;
-    let soloParent = rosterData.personalInformation.soloParent.value;
-    let relHH = rosterData.personalInformation.relHH.value;
-    let relFH = rosterData.personalInformation.relFH.value;
-    let familyNumber = rosterData.personalInformation.familyNumber.value;
-
-    let seeing = rosterData.functionalDifficulty.seeing.value;
-    let hearing = rosterData.functionalDifficulty.hearing.value;
-    let walking = rosterData.functionalDifficulty.walking.value;
-    let remembering = rosterData.functionalDifficulty.remembering.value;
-    let caring = rosterData.functionalDifficulty.caring.value;
-    let communicating = rosterData.functionalDifficulty.communicating.value;
-
-    let attendingSchool = rosterData.education.attendingSchool.value;
-    let highestEducationAttained = rosterData.education.highestEducationAttained.value;
-
-    let employment = rosterData.employmentInformation.employment.value;
-    let occupationEnumerator = rosterData.employmentInformation.occupationEnumerator.value;
-    let occupationAreaSupervisor = rosterData.employmentInformation.occupationAreaSupervisor.value;
-    let psoc = rosterData.employmentInformation.psoc.value;
-    let natureOfEmployment = rosterData.employmentInformation.natureOfEmployment.value;
-    let basisOfPayment = rosterData.employmentInformation.basisOfPayment.value;
-    let classOfWorker = rosterData.employmentInformation.classOfWorker.value;
-
-    let overseas = rosterData.overseasIndicator.overseas.value;
-    let ofi = rosterData.overseasIndicator.ofi.value;
-    let sendingMoney = rosterData.overseasIndicator.sendingMoney.value;
-    let howOften = rosterData.overseasIndicator.howOften.value;
-
-    rosterData.lineNo.error = validateLineNo(rosterData.lineNo.value);
-
-    rosterData.personalInformation.firstName.error = validateName(firstName, 'FIRSTNAME');
-    rosterData.personalInformation.middleName.error = validateName(middleName, 'MIDDLENAME');
-    rosterData.personalInformation.lastName.error = validateName(lastName, 'LASTNAME');
-
-    
-    if(rosterData.personalInformation.birthdayAge.birthday_checkbox == false && rosterData.personalInformation.birthdayAge.age_checkbox == false){
-        rosterData.personalInformation.birthdayAge.error = "Please provide either date of birth or age.";
-    } else{
-        rosterData.personalInformation.birthdayAge.error = "";
-        if(rosterData.personalInformation.birthdayAge.birthday_checkbox == true){
-            rosterData.personalInformation.birthdayAge.birthYear.error = validateYear(birthYear,rosterData.personalInformation.birthdayAge.birthday_checkbox);
-            rosterData.personalInformation.birthdayAge.birthMonth.error = validateMonth(birthMonth);
-            rosterData.personalInformation.birthdayAge.birthDay.error = validateDay(birthDay, birthMonth, birthYear);
-        } else if( rosterData.personalInformation.birthdayAge.age_checkbox == true ){
-            rosterData.personalInformation.birthdayAge.age.error = validateAge(age,rosterData.personalInformation.birthdayAge.age_checkbox);
-        }
-    }
-
-    rosterData.personalInformation.sex.error = validateSelections(sex);
-    rosterData.personalInformation.relHH.error = validateRelHH(relHH, age, householdHeadCount, maritalStatus);
-    rosterData.personalInformation.relFH.error = validateRelFH(relFH, relHH, maritalStatus);
-    rosterData.personalInformation.familyNumber.error = validateFamilyNumber(familyNumber, relHH, currentMaxFn);
-
-    // second parameter is to validate if got selected
-    rosterData.personalInformation.pregnant.error = validatePregnant(pregnant, age, sex );
-    rosterData.personalInformation.maritalStatus.error = validateMaritalStatus(maritalStatus, age);
-    rosterData.personalInformation.soloParent.error = validateSoloParent(soloParent, age, relHH, maritalStatus);
-    
-
-    rosterData.functionalDifficulty.seeing.error = validateSelections(seeing);
-    rosterData.functionalDifficulty.hearing.error = validateSelections(hearing);
-    rosterData.functionalDifficulty.walking.error = validateSelections(walking);
-    rosterData.functionalDifficulty.remembering.error = validateSelections(remembering);
-    rosterData.functionalDifficulty.caring.error = validateSelections(caring);
-    rosterData.functionalDifficulty.communicating.error = validateSelections(communicating);
-
-    rosterData.education.attendingSchool.error = validateAttendingSchool(attendingSchool, age);
-    rosterData.education.highestEducationAttained.error = validateHighestEducationAttained(highestEducationAttained, age);
-
-    rosterData.employmentInformation.employment.error = validateEmployment(employment,age);
-    rosterData.employmentInformation.occupationEnumerator.error = validateOccupation(occupationEnumerator,employment);
-    rosterData.employmentInformation.occupationAreaSupervisor.error = validateOccupation(occupationAreaSupervisor,employment);
-    rosterData.employmentInformation.psoc.error = validatePsoc(psoc,employment);
-    rosterData.employmentInformation.classOfWorker.error = validateClassOfWorker(classOfWorker , employment);
-    rosterData.employmentInformation.basisOfPayment.error = validateBasisOfPayment(basisOfPayment, employment, classOfWorker);
-    rosterData.employmentInformation.natureOfEmployment.error = validateNatureOfEmployment(natureOfEmployment,employment);
-
-    rosterData.overseasIndicator.overseas.error = validateSelections(overseas);
-    rosterData.overseasIndicator.ofi.error = validateOfi(ofi,overseas,age);
-    rosterData.overseasIndicator.sendingMoney.error = validateSendingMoney(sendingMoney,overseas,ofi);
-    rosterData.overseasIndicator.howOften.error = validateHowOften(howOften,overseas,sendingMoney);
-
-    if(rosterData.personalInformation.birthdayAge.error != "" || rosterData.lineNo.error != "" || rosterData.personalInformation.firstName.error != "" || rosterData.personalInformation.middleName.error != "" || rosterData.personalInformation.lastName.error != "" ||
-       rosterData.personalInformation.birthdayAge.age.error != "" || rosterData.personalInformation.sex.error != "" || rosterData.personalInformation.relHH.error != "" || rosterData.personalInformation.pregnant.error != "" ||
-       rosterData.personalInformation.maritalStatus.error != "" || rosterData.personalInformation.soloParent.error != "" ||
-       rosterData.personalInformation.relFH.error != "" || rosterData.personalInformation.familyNumber.error != ""){ 
-        retVal = true;
-    }
-
-    if(rosterData.functionalDifficulty.seeing.error != "" || rosterData.functionalDifficulty.hearing.error != "" || rosterData.functionalDifficulty.walking.error != "" ||
-        rosterData.functionalDifficulty.caring.error != ""  || rosterData.functionalDifficulty.remembering.error != "" || rosterData.functionalDifficulty.communicating.error != "" ){ 
-        retVal = true;
-    }
-
-    if(rosterData.education.attendingSchool.error != ""  || rosterData.education.highestEducationAttained.error != "" ){ 
-        retVal = true;
-    }
-
-    if(rosterData.employmentInformation.employment.error != "" || rosterData.employmentInformation.occupationEnumerator.error != "" || rosterData.employmentInformation.occupationAreaSupervisor.error != "" || rosterData.employmentInformation.psoc.error != "" ||
-        rosterData.employmentInformation.classOfWorker.error != "" || rosterData.employmentInformation.basisOfPayment.error != "" || rosterData.employmentInformation.natureOfEmployment.error != "" ){ 
-        retVal = true;
-    }
-
-    if(rosterData.overseasIndicator.overseas.error != "" || rosterData.overseasIndicator.ofi.error != "" ||
-        rosterData.overseasIndicator.sendingMoney.error != "" || rosterData.overseasIndicator.howOften.error != ""){ 
-        retVal = true;
-    }
-
-    rosterData.hasError = retVal;
-
-    return rosterData;
-    
 }
 
 function validateSelections(value){

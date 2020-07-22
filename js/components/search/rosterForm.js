@@ -1,5 +1,5 @@
 Vue.component('rosterForm', {
-	props: ['showRosterUpdateModal', 'rosterToUpdate', 'selectedRoster', 'householdRoster', 'isAddRoster'],
+	props: ['showRosterUpdateModal', 'rosterToUpdate', 'selectedRoster', 'householdRoster', 'isAddRoster', 'householdHeadCount', 'currentMaxFn'],
 	template: `
         <div>
             <div class="modal" :class="{'is-active':showRosterUpdateModal}">
@@ -19,7 +19,7 @@ Vue.component('rosterForm', {
                                     <div class="w3-row">
                                         <div class="w3-row">
                                             <p class="help">Last</p>
-                                            <input class="input upperCase" maxlength="40" :class="{'is-danger':rosterToUpdate.lastName.error != ''}" type="text" v-model="rosterToUpdate.lastName.value" >
+                                            <input class="input upperCase" maxlength="40" :class="{'is-danger':rosterToUpdate.lastName.error != ''}" type="text" v-model="rosterToUpdate.lastName.value" @change="validateLastName(rosterToUpdate.firstName.value)" >
                                             
                                             <p class="help is-danger">{{rosterToUpdate.lastName.error}}</p>
                                         </div>
@@ -56,20 +56,20 @@ Vue.component('rosterForm', {
                                             <div class="w3-col l8 w3-border-right">
                                                 <div class="w3-row-padding">
                                                     <div class="w3-col l2">
-                                                        <input class="w3-check w3-border" type="checkbox" v-model="rosterToUpdate.birthdayAge.birthday_checkbox" @click="toggleBirthdayAge('BIRTHDAY')" >
+                                                        <input class="w3-check w3-border" type="checkbox" v-model="rosterToUpdate.birthdayAge.birthdayCheckbox" @click="toggleBirthdayAge('BIRTHDAY')" >
                                                     </div>
                                                     <div class="w3-col l3">
-                                                        <input class="input" type="text" :class="{'is-danger' : rosterToUpdate.birthdayAge.birthMonth.error != ''}" maxlength="2" v-model="rosterToUpdate.birthdayAge.birthMonth.value" :disabled="!rosterToUpdate.birthdayAge.birthday_checkbox" @change="changeBirthMonth">
+                                                        <input class="input" type="text" :class="{'is-danger' : rosterToUpdate.birthdayAge.birthMonth.error != ''}" maxlength="2" v-model="rosterToUpdate.birthdayAge.birthMonth.value" :disabled="!rosterToUpdate.birthdayAge.birthdayCheckbox" @change="changeBirthMonth">
                                                         <p class="help">MM</p>
                                                         <p class="help is-danger">{{rosterToUpdate.birthdayAge.birthMonth.error}}</p>
                                                     </div>
                                                     <div class="w3-col l3">
-                                                        <input class="input" type="text" :class="{'is-danger' : rosterToUpdate.birthdayAge.birthDay.error != ''}" maxlength="2" v-model="rosterToUpdate.birthdayAge.birthDay.value" :disabled="!rosterToUpdate.birthdayAge.birthday_checkbox" @change="changeBirthDay">
+                                                        <input class="input" type="text" :class="{'is-danger' : rosterToUpdate.birthdayAge.birthDay.error != ''}" maxlength="2" v-model="rosterToUpdate.birthdayAge.birthDay.value" :disabled="!rosterToUpdate.birthdayAge.birthdayCheckbox" @change="changeBirthDay">
                                                         <p class="help">DD</p>
                                                         <p class="help is-danger">{{rosterToUpdate.birthdayAge.birthDay.error}}</p>
                                                     </div>
                                                     <div class="w3-col l4">
-                                                        <input class="input" type="text" :class="{'is-danger' : rosterToUpdate.birthdayAge.birthYear.error != ''}" maxlength="4" v-model="rosterToUpdate.birthdayAge.birthYear.value" :disabled="!rosterToUpdate.birthdayAge.birthday_checkbox" @change="changeBirthYear">
+                                                        <input class="input" type="text" :class="{'is-danger' : rosterToUpdate.birthdayAge.birthYear.error != ''}" maxlength="4" v-model="rosterToUpdate.birthdayAge.birthYear.value" :disabled="!rosterToUpdate.birthdayAge.birthdayCheckbox" @change="changeBirthYear">
                                                         <p class="help">YYYY</p>
                                                         <p class="help is-danger">{{rosterToUpdate.birthdayAge.birthYear.error}}</p>
                                                     </div>
@@ -78,10 +78,10 @@ Vue.component('rosterForm', {
                                             <div class="w3-col l4">
                                                 <div class="w3-row-padding">
                                                     <div class="w3-col l3">
-                                                        <input class="w3-check" type="checkbox" v-model="rosterToUpdate.birthdayAge.age_checkbox" @click="toggleBirthdayAge('AGE')" >
+                                                        <input class="w3-check" type="checkbox" v-model="rosterToUpdate.birthdayAge.ageCheckbox" @click="toggleBirthdayAge('AGE')" >
                                                     </div>
                                                     <div class="w3-col l9">
-                                                        <input class="input" type="text" :class="{'is-danger' : rosterToUpdate.birthdayAge.age.error != ''}" maxlength="3" v-model="rosterToUpdate.birthdayAge.age.value" :disabled="!rosterToUpdate.birthdayAge.age_checkbox" @change="changeAge">
+                                                        <input class="input" type="text" :class="{'is-danger' : rosterToUpdate.birthdayAge.age.error != ''}" maxlength="3" v-model="rosterToUpdate.birthdayAge.age.value" :disabled="!rosterToUpdate.birthdayAge.ageCheckbox" @change="changeAge">
                                                         <p class="help">Age</p>
                                                         <p class="help is-danger">{{rosterToUpdate.birthdayAge.age.error}}</p>
                                                     </div>
@@ -95,7 +95,6 @@ Vue.component('rosterForm', {
                                             <family-roster-div-select
                                                 :object = "sex"
                                                 :value = "rosterToUpdate.sex"
-                                                :disableCtr = "!isAddRoster"
                                                 @validate-select = "changeSex"
                                             >
                                             </family-roster-div-select>
@@ -105,7 +104,6 @@ Vue.component('rosterForm', {
                                             <family-roster-div-select
                                                 :object = "pregnant"
                                                 :value = "rosterToUpdate.pregnant"
-                                                :disableCtr = "!isAddRoster && rosterToUpdate.pregnant.error == ''"
                                                 @validate-select = "validatePregnant()"
                                             >
                                             </family-roster-div-select>
@@ -128,7 +126,6 @@ Vue.component('rosterForm', {
                                         <family-roster-div-select
                                             :object = "soloParent"
                                             :value = "rosterToUpdate.soloParent"
-                                            :disableCtr = "!isAddRoster  && rosterToUpdate.soloParent.error == ''"
                                             @validate-select = "validateSoloParent()"
                                         >
                                         </family-roster-div-select>
@@ -138,7 +135,6 @@ Vue.component('rosterForm', {
                                         <family-roster-div-select
                                             :object = "relHH"
                                             :value = "rosterToUpdate.relHH"
-                                            :disableCtr = "!isAddRoster && this.rosterToUpdate.relHH.error == ''"
                                             @validate-select = "validateRelHH()"
                                         >
                                         </family-roster-div-select>
@@ -148,7 +144,6 @@ Vue.component('rosterForm', {
                                         <family-roster-div-select
                                             :object = "relFH"
                                             :value = "rosterToUpdate.relFH"
-                                            :disableCtr = "!isAddRoster  && rosterToUpdate.relFH.error == ''"
                                             @validate-select = "validateRelFH()"
                                         >
                                         </family-roster-div-select>
@@ -158,7 +153,6 @@ Vue.component('rosterForm', {
                                         <family-roster-div-select
                                             :object = "familyNumber"
                                             :value = "rosterToUpdate.familyNumber"
-                                            :disableCtr = "!isAddRoster  && rosterToUpdate.familyNumber.error == ''"
                                             @validate-select = "validateFamilyNumber()"
                                         >
                                         </family-roster-div-select>
@@ -177,7 +171,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "seeing"
                                     :value = "rosterToUpdate.seeing"
-                                    :disableCtr = "!isAddRoster "
                                     @validate-select = "validateSeeing"
                                 >
                                 </family-roster-div-select>
@@ -187,7 +180,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "hearing"
                                     :value = "rosterToUpdate.hearing"
-                                    :disableCtr = "!isAddRoster"
                                     @validate-select = "validateHearing"
                                 >
                                 </family-roster-div-select>
@@ -197,7 +189,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "walking"
                                     :value = "rosterToUpdate.walking"
-                                    :disableCtr = "!isAddRoster"
                                     @validate-select = "validateWalking"
                                 >
                                 </family-roster-div-select>
@@ -207,7 +198,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "remembering"
                                     :value = "rosterToUpdate.remembering"
-                                    :disableCtr = "!isAddRoster"
                                     @validate-select = "validateRemembering"
                                 >
                                 </family-roster-div-select>
@@ -217,7 +207,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "caring"
                                     :value = "rosterToUpdate.caring"
-                                    :disableCtr = "!isAddRoster"
                                     @validate-select = "validateCaring"
                                 >
                                 </family-roster-div-select>
@@ -227,7 +216,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "communicating"
                                     :value = "rosterToUpdate.communicating"
-                                    :disableCtr = "!isAddRoster"
                                     @validate-select = "validateCommunicating"
                                 >
                                 </family-roster-div-select>
@@ -244,7 +232,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "attendingSchool"
                                     :value = "rosterToUpdate.attendingSchool"
-                                    :disableCtr = "!isAddRoster  && rosterToUpdate.attendingSchool.error == ''"
                                     @validate-select = "validateAttendingSchool"
                                 >
                                 </family-roster-div-select>
@@ -254,7 +241,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "highestEducationAttained"
                                     :value = "rosterToUpdate.highestEducationAttained"
-                                    :disableCtr = "!isAddRoster  && rosterToUpdate.highestEducationAttained.error == ''"
                                     @validate-select = "validateHighestEducationAttained()"
                                 >
                                 </family-roster-div-select>
@@ -271,7 +257,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "employment"
                                     :value = "rosterToUpdate.employment"
-                                    :disableCtr = "!isAddRoster && rosterToUpdate.employment.error == ''"
                                     @validate-select = "validateEmployment()"
                                 >
                                 </family-roster-div-select>
@@ -287,7 +272,6 @@ Vue.component('rosterForm', {
                                     <family-roster-input-occupation
                                         :object = "occupation"
                                         :value = "rosterToUpdate.occupationEnumerator"
-                                        :disableCtr = "!isAddRoster && rosterToUpdate.occupationEnumerator.error == ''"
                                         :maxLength = "250"
                                         :help-label = "1"
                                         @validate-text-input = "validateOccupationEnumerator()"
@@ -299,7 +283,6 @@ Vue.component('rosterForm', {
                                     <family-roster-input-occupation
                                         :object = "occupation"
                                         :value = "rosterToUpdate.occupationAreaSupervisor"
-                                        :disableCtr = "!isAddRoster  && rosterToUpdate.occupationAreaSupervisor.error == ''"
                                         :maxLength = "250"
                                         :help-label = "2"
                                         @validate-text-input = "validateOccupationAreaSupervisor()"
@@ -312,7 +295,6 @@ Vue.component('rosterForm', {
                                 <family-roster-input
                                     :object = "psoc"
                                     :value = "rosterToUpdate.psoc"
-                                    :disableCtr = "!isAddRoster  && rosterToUpdate.psoc.error == ''"
                                     :maxLength = "4"
                                     @validate-text-input = "validatePsoc()"
                                 >
@@ -323,7 +305,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "classOfWorker"
                                     :value = "rosterToUpdate.classOfWorker"
-                                    :disableCtr = "!isAddRoster  && rosterToUpdate.classOfWorker.error == ''"
                                     @validate-select = "validateClassOfWorker()"
                                 >
                                 </family-roster-div-select>
@@ -333,7 +314,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "basisOfPayment"
                                     :value = "rosterToUpdate.basisOfPayment "
-                                    :disableCtr = "!isAddRoster  && rosterToUpdate.basisOfPayment.error == ''"
                                     @validate-select = "validateBasisOfPayment()"
                                 >
                                 </family-roster-div-select>
@@ -343,7 +323,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "natureOfEmployment"
                                     :value = "rosterToUpdate.natureOfEmployment"
-                                    :disableCtr = "!isAddRoster  && rosterToUpdate.natureOfEmployment.error == ''"
                                     @validate-select = "validateNatureOfEmployment()"
                                 >
                                 </family-roster-div-select>
@@ -361,7 +340,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "overseas"
                                     :value = "rosterToUpdate.overseas"
-                                    :disableCtr = "!isAddRoster  && rosterToUpdate.overseas.error == ''"
                                     @validate-select = "validateOverseas"
                                 >
                                 </family-roster-div-select>
@@ -372,7 +350,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "ofi"
                                     :value = "rosterToUpdate.ofi"
-                                    :disableCtr = "!isAddRoster  && rosterToUpdate.ofi.error == ''"
                                     @validate-select = "validateOfi()"
                                 >
                                 </family-roster-div-select>
@@ -383,7 +360,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "sendingMoney"
                                     :value = "rosterToUpdate.sendingMoney"
-                                    :disableCtr = "!isAddRoster  && rosterToUpdate.sendingMoney.error == ''"
                                     @validate-select = "validateSendingMoney()"
                                 >
                                 </family-roster-div-select>
@@ -393,7 +369,6 @@ Vue.component('rosterForm', {
                                 <family-roster-div-select
                                     :object = "howOften"
                                     :value = "rosterToUpdate.howOften"
-                                    :disableCtr = "!isAddRoster  && rosterToUpdate.howOften.error == ''"
                                     @validate-select = "validateHowOften()"
                                 >
                                 </family-roster-div-select>
@@ -408,7 +383,7 @@ Vue.component('rosterForm', {
                     <footer class="modal-card-foot">
 
                         <span v-if="isAddRoster"><button class="button is-success" @click="addRoster"><i class="fas fa-plus-square"></i> &nbsp Add Roster</button></span>
-                        <span v-else=""><button class="button is-success"><i class="fas fa-pen-square" @click="updateRoster"></i> &nbsp Update Roster</button></span>
+                        <span v-else=""><button class="button is-success" @click="updateRoster"><i class="fas fa-pen-square" ></i> &nbsp Update Roster</button></span>
                         &nbsp&nbsp<button class="button" @click="closeRosterModal">Cancel</button>
                     </footer>
 
@@ -426,7 +401,6 @@ Vue.component('rosterForm', {
             disableCtr : false,
             updatingRosterError : "",
             libExtensionNames : extNameSelection(),
-            dateEnumerated : '2020-07-09',
 
             extNames : {
                 lib : extNameSelection()
@@ -561,37 +535,6 @@ Vue.component('rosterForm', {
 
     },
 
-    computed : {
-
-        computedFamilyRoster(){
-
-            return this.householdRoster.filter(roster => roster.archive != 1);
-
-        },
-
-        householdHeadCount(){
-
-            return this.computedFamilyRoster.filter((roster, index) => roster.relHH.value == 1  && index != this.selectedRow).length;
-
-        },
-
-        currentMaxFn(){
-            let retVal = 0;
-
-            if(this.computedFamilyRoster.length == 0) retVal = 0;
-            else{
-                this.computedFamilyRoster.forEach(function(roster){
-
-                    if(roster.familyNumber.value > retVal ) retVal = roster.familyNumber.value;
-
-                });
-            }
-
-            return retVal;
-        }
-
-    },
-
 	methods: {
 
         closeRosterModal(){
@@ -600,27 +543,167 @@ Vue.component('rosterForm', {
 
         },
 
+        validateRoster(rosterData){
+
+            let retVal = false;
+            /**
+
+                -- function validateSelection only used to validate fields that no other validation beside REQUIRED
+                -- function validateSelection is at js/scripts/commonValidation Routines.js
+                -- others is at js/scripts/familyRosterValidationRoutines.js
+
+            */
+
+            let age = this.rosterToUpdate.birthdayAge.age.value;
+            let birthDay = this.rosterToUpdate.birthdayAge.birthDay.value;
+            let birthMonth = this.rosterToUpdate.birthdayAge.birthMonth.value;
+            let birthYear = this.rosterToUpdate.birthdayAge.birthYear.value;
+
+            let firstName = this.rosterToUpdate.firstName.value;
+            let middleName = this.rosterToUpdate.middleName.value;
+            let lastName = this.rosterToUpdate.lastName.value;
+
+            let sex = this.rosterToUpdate.sex.value;
+            let pregnant = this.rosterToUpdate.pregnant.value;
+            let maritalStatus = this.rosterToUpdate.maritalStatus.value;
+            let soloParent = this.rosterToUpdate.soloParent.value;
+            let relHH = this.rosterToUpdate.relHH.value;
+            let relFH = this.rosterToUpdate.relFH.value;
+            let familyNumber = this.rosterToUpdate.familyNumber.value;
+
+            let seeing = this.rosterToUpdate.seeing.value;
+            let hearing = this.rosterToUpdate.hearing.value;
+            let walking = this.rosterToUpdate.walking.value;
+            let remembering = this.rosterToUpdate.remembering.value;
+            let caring = this.rosterToUpdate.caring.value;
+            let communicating = this.rosterToUpdate.communicating.value;
+
+            let attendingSchool = this.rosterToUpdate.attendingSchool.value;
+            let highestEducationAttained = this.rosterToUpdate.highestEducationAttained.value;
+
+            let employment = this.rosterToUpdate.employment.value;
+            let occupationEnumerator = this.rosterToUpdate.occupationEnumerator.value;
+            let occupationAreaSupervisor = this.rosterToUpdate.occupationAreaSupervisor.value;
+            let psoc = this.rosterToUpdate.psoc.value;
+            let natureOfEmployment = this.rosterToUpdate.natureOfEmployment.value;
+            let basisOfPayment = this.rosterToUpdate.basisOfPayment.value;
+            let classOfWorker = this.rosterToUpdate.classOfWorker.value;
+
+            let overseas = this.rosterToUpdate.overseas.value;
+            let ofi = this.rosterToUpdate.ofi.value;
+            let sendingMoney = this.rosterToUpdate.sendingMoney.value;
+            let howOften = this.rosterToUpdate.howOften.value;
+
+            this.rosterToUpdate.firstName.error = validateName(firstName, 'FIRSTNAME');
+            this.rosterToUpdate.middleName.error = validateName(middleName, 'MIDDLENAME');
+            this.rosterToUpdate.lastName.error = validateName(lastName, 'LASTNAME');
+
+            
+            if(this.rosterToUpdate.birthdayAge.birthdayCheckbox == false && this.rosterToUpdate.birthdayAge.ageCheckbox == false){
+                this.rosterToUpdate.birthdayAge.error = "Please provide either date of birth or age.";
+            } else{
+                this.rosterToUpdate.birthdayAge.error = "";
+                if(this.rosterToUpdate.birthdayAge.birthdayCheckbox == true){
+                    this.rosterToUpdate.birthdayAge.birthYear.error = validateYear(birthYear,this.rosterToUpdate.birthdayAge.birthdayCheckbox);
+                    this.rosterToUpdate.birthdayAge.birthMonth.error = validateMonth(birthMonth);
+                    this.rosterToUpdate.birthdayAge.birthDay.error = validateDay(birthDay, birthMonth, birthYear);
+                } else if( this.rosterToUpdate.birthdayAge.ageCheckbox == true ){
+                    this.rosterToUpdate.birthdayAge.age.error = validateAge(age,this.rosterToUpdate.birthdayAge.ageCheckbox);
+                }
+            }
+
+            this.rosterToUpdate.sex.error = validateSelections(sex);
+
+            this.rosterToUpdate.relHH.error = validateRelHH(relHH, age, this.householdHeadCount, maritalStatus, this.householdRoster[this.selectedRoster].relHH.value);
+
+
+            this.rosterToUpdate.relFH.error = validateRelFH(relFH, relHH, maritalStatus);
+
+            this.rosterToUpdate.familyNumber.error = validateFamilyNumber(familyNumber, relHH, this.currentMaxFn);
+
+            // second parameter is to validate if got selected
+            this.rosterToUpdate.pregnant.error = validatePregnant(pregnant, age, sex );
+            this.rosterToUpdate.maritalStatus.error = validateMaritalStatus(maritalStatus, age);
+            this.rosterToUpdate.soloParent.error = validateSoloParent(soloParent, age, relHH, maritalStatus);
+            
+
+            this.rosterToUpdate.seeing.error = validateSelections(seeing);
+            this.rosterToUpdate.hearing.error = validateSelections(hearing);
+            this.rosterToUpdate.walking.error = validateSelections(walking);
+            this.rosterToUpdate.remembering.error = validateSelections(remembering);
+            this.rosterToUpdate.caring.error = validateSelections(caring);
+            this.rosterToUpdate.communicating.error = validateSelections(communicating);
+
+            this.rosterToUpdate.attendingSchool.error = validateAttendingSchool(attendingSchool, age);
+            this.rosterToUpdate.highestEducationAttained.error = validateHighestEducationAttained(highestEducationAttained, age);
+
+            this.rosterToUpdate.employment.error = validateEmployment(employment,age);
+            this.rosterToUpdate.occupationEnumerator.error = validateOccupation(occupationEnumerator,employment);
+            this.rosterToUpdate.occupationAreaSupervisor.error = validateOccupation(occupationAreaSupervisor,employment);
+            this.rosterToUpdate.psoc.error = validatePsoc(psoc,employment);
+            this.rosterToUpdate.classOfWorker.error = validateClassOfWorker(classOfWorker , employment);
+            this.rosterToUpdate.basisOfPayment.error = validateBasisOfPayment(basisOfPayment, employment, classOfWorker);
+            this.rosterToUpdate.natureOfEmployment.error = validateNatureOfEmployment(natureOfEmployment,employment);
+
+            this.rosterToUpdate.overseas.error = validateSelections(overseas);
+            this.rosterToUpdate.ofi.error = validateOfi(ofi,overseas,age);
+            this.rosterToUpdate.sendingMoney.error = validateSendingMoney(sendingMoney,overseas,ofi);
+            this.rosterToUpdate.howOften.error = validateHowOften(howOften,overseas,sendingMoney);
+
+            if(this.rosterToUpdate.birthdayAge.error != "" || this.rosterToUpdate.firstName.error != "" || this.rosterToUpdate.middleName.error != "" || this.rosterToUpdate.lastName.error != "" ||
+               this.rosterToUpdate.birthdayAge.age.error != "" || this.rosterToUpdate.sex.error != "" || this.rosterToUpdate.relHH.error != "" || this.rosterToUpdate.pregnant.error != "" ||
+               this.rosterToUpdate.maritalStatus.error != "" || this.rosterToUpdate.soloParent.error != "" ||
+               this.rosterToUpdate.relFH.error != "" || this.rosterToUpdate.familyNumber.error != ""){ 
+                retVal = true;
+            }
+
+            if(this.rosterToUpdate.seeing.error != "" || this.rosterToUpdate.hearing.error != "" || this.rosterToUpdate.walking.error != "" ||
+                this.rosterToUpdate.caring.error != ""  || this.rosterToUpdate.remembering.error != "" || this.rosterToUpdate.communicating.error != "" ){ 
+                retVal = true;
+            }
+
+            if(this.rosterToUpdate.attendingSchool.error != ""  || this.rosterToUpdate.highestEducationAttained.error != "" ){ 
+                retVal = true;
+            }
+
+            if(this.rosterToUpdate.employment.error != "" || this.rosterToUpdate.occupationEnumerator.error != "" || this.rosterToUpdate.occupationAreaSupervisor.error != "" || this.rosterToUpdate.psoc.error != "" ||
+                this.rosterToUpdate.classOfWorker.error != "" || this.rosterToUpdate.basisOfPayment.error != "" || this.rosterToUpdate.natureOfEmployment.error != "" ){ 
+                retVal = true;
+            }
+
+            if(this.rosterToUpdate.overseas.error != "" || this.rosterToUpdate.ofi.error != "" ||
+                this.rosterToUpdate.sendingMoney.error != "" || this.rosterToUpdate.howOften.error != ""){ 
+                retVal = true;
+            }
+
+            return retVal;
+            
+        },
+
         addRoster(){
 
-            this.$emit('add-roster');
+            
+            if(!(this.validateRoster(this.rosterToUpdate))){
+                this.rosterToUpdate.firstName.value = this.rosterToUpdate.firstName.value.toUpperCase();
+                this.rosterToUpdate.middleName.value = this.rosterToUpdate.middleName.value.toUpperCase();
+                this.rosterToUpdate.lastName.value = this.rosterToUpdate.lastName.value.toUpperCase();
+
+                this.$emit('add-roster'); 
+            } 
 
         },
 
         updateRoster(){
 
-            this.validateFirstName();
-            this.validateMiddleName();
-            this.validateLastName();
-            this.validateSex();
+            if(!(this.validateRoster(this.rosterToUpdate))){
+                this.rosterToUpdate.firstName.value = this.rosterToUpdate.firstName.value.toUpperCase();
+                this.rosterToUpdate.middleName.value = this.rosterToUpdate.middleName.value.toUpperCase();
+                this.rosterToUpdate.lastName.value = this.rosterToUpdate.lastName.value.toUpperCase();
 
-            this.updatingRosterError = validateUpdateChangesRoster(this.householdRoster[this.selectedRoster], this.rosterToUpdate);
-
-            if(this.rosterToUpdate.firstName.error == "" && this.rosterToUpdate.middleName.error == "" && this.rosterToUpdate.lastName.error == "" &&
-                    this.rosterToUpdate.sex.error == "" && this.updatingRosterError == ""){
-
-                this.$emit('update-roster');
+                this.$emit('update-roster'); 
 
             }
+
         },
 
         validateFirstName(){
@@ -649,7 +732,7 @@ Vue.component('rosterForm', {
 
         validateAgeOnBirthdayInput(age){
             this.rosterToUpdate.birthdayAge.age.value = age;
-            this.rosterToUpdate.birthdayAge.age.error = validateAge(age,this.rosterToUpdate.birthdayAge.age_checkbox);
+            this.rosterToUpdate.birthdayAge.age.error = validateAge(age,this.rosterToUpdate.birthdayAge.ageCheckbox);
             
             if(this.rosterToUpdate.pregnant.value != -1 || !this.addRoster) this.validatePregnant();
 
@@ -674,7 +757,7 @@ Vue.component('rosterForm', {
 
             this.rosterToUpdate.birthdayAge.age.value = "";
 
-            this.rosterToUpdate.birthdayAge.birthYear.error = validateYear(this.rosterToUpdate.birthdayAge.birthYear.value,this.rosterToUpdate.birthdayAge.birthday_checkbox);
+            this.rosterToUpdate.birthdayAge.birthYear.error = validateYear(this.rosterToUpdate.birthdayAge.birthYear.value,this.rosterToUpdate.birthdayAge.birthdayCheckbox);
 
             if(this.rosterToUpdate.birthdayAge.birthDay.value != ""){
                 
@@ -688,7 +771,7 @@ Vue.component('rosterForm', {
             
             if(this.rosterToUpdate.birthdayAge.birthYear.error == "" && this.rosterToUpdate.birthdayAge.birthDay.error == ""){
 
-                this.validateAgeOnBirthdayInput(computeAge(this.dateEnumerated, this.rosterToUpdate.birthdayAge.birthDay.value, this.rosterToUpdate.birthdayAge.birthMonth.value, this.rosterToUpdate.birthdayAge.birthYear.value));
+                this.validateAgeOnBirthdayInput(computeAge(this.rosterToUpdate.birthdayAge.birthDay.value, this.rosterToUpdate.birthdayAge.birthMonth.value, this.rosterToUpdate.birthdayAge.birthYear.value));
                 
             }
 
@@ -698,7 +781,6 @@ Vue.component('rosterForm', {
 
             this.rosterToUpdate.birthdayAge.age.value = "";
 
-            
             this.rosterToUpdate.birthdayAge.birthMonth.error = validateMonth(this.rosterToUpdate.birthdayAge.birthMonth.value, this.rosterToUpdate.birthdayAge.birthYear.value);  
             
 
@@ -712,7 +794,7 @@ Vue.component('rosterForm', {
             
             if(this.rosterToUpdate.birthdayAge.birthMonth.error == "" && this.rosterToUpdate.birthdayAge.birthDay.error == ""){
                 
-                this.validateAgeOnBirthdayInput(computeAge(this.dateEnumerated, this.rosterToUpdate.birthdayAge.birthDay.value, this.rosterToUpdate.birthdayAge.birthMonth.value, this.rosterToUpdate.birthdayAge.birthYear.value));
+                this.validateAgeOnBirthdayInput(computeAge(this.rosterToUpdate.birthdayAge.birthDay.value, this.rosterToUpdate.birthdayAge.birthMonth.value, this.rosterToUpdate.birthdayAge.birthYear.value));
                 
             }
         },
@@ -727,14 +809,15 @@ Vue.component('rosterForm', {
 
             if(this.rosterToUpdate.birthdayAge.birthDay.error == "" ){
                 
-                this.validateAgeOnBirthdayInput(computeAge(this.dateEnumerated, this.rosterToUpdate.birthdayAge.birthDay.value, this.rosterToUpdate.birthdayAge.birthMonth.value, this.rosterToUpdate.birthdayAge.birthYear.value));
+                this.validateAgeOnBirthdayInput(computeAge(this.rosterToUpdate.birthdayAge.birthDay.value, this.rosterToUpdate.birthdayAge.birthMonth.value, this.rosterToUpdate.birthdayAge.birthYear.value));
                 
             }
 
         },
 
         changeAge(){
-            this.rosterToUpdate.birthdayAge.age.error = validateAge(this.rosterToUpdate.birthdayAge.age.value,this.rosterToUpdate.birthdayAge.age_checkbox);
+
+            this.rosterToUpdate.birthdayAge.age.error = validateAge(this.rosterToUpdate.birthdayAge.age.value,this.rosterToUpdate.birthdayAge.ageCheckbox);
             
             if(this.rosterToUpdate.pregnant.value != -1) this.validatePregnant();
 
@@ -742,7 +825,7 @@ Vue.component('rosterForm', {
 
             if(this.rosterToUpdate.maritalStatus.value != -1) this.validateMaritalStatus();
 
-            if(this.rosterToUpdate.relHH.value != -1) this.rosterToUpdate.relHH.error = validateRelHH(this.rosterToUpdate.relHH.value,this.rosterToUpdate.birthdayAge.age.value, this.householdHeadCount, this.rosterToUpdate.maritalStatus.value);
+            if(this.rosterToUpdate.relHH.value != -1) this.rosterToUpdate.relHH.error = validateRelHH(this.rosterToUpdate.relHH.value,this.rosterToUpdate.birthdayAge.age.value, this.householdHeadCount, this.rosterToUpdate.maritalStatus.value, this.householdRoster[this.selectedRoster].relHH.value);
 
 
         },
@@ -759,9 +842,9 @@ Vue.component('rosterForm', {
             this.rosterToUpdate.birthdayAge.birthYear.error = "";
 
             if(identifier == "BIRTHDAY"){
-                this.rosterToUpdate.birthdayAge.age_checkbox = false;
+                this.rosterToUpdate.birthdayAge.ageCheckbox = false;
             } else if (identifier == "AGE"){
-                this.rosterToUpdate.birthdayAge.birthday_checkbox = false;
+                this.rosterToUpdate.birthdayAge.birthdayCheckbox = false;
             }
 
         },
@@ -787,7 +870,7 @@ Vue.component('rosterForm', {
         validateMaritalStatus(){
 
             this.rosterToUpdate.maritalStatus.error = validateMaritalStatus(this.rosterToUpdate.maritalStatus.value, this.rosterToUpdate.birthdayAge.age.value);
-            if(this.rosterToUpdate.relHH.value != -1) this.rosterToUpdate.relHH.error = validateRelHH(this.rosterToUpdate.relHH.value,this.rosterToUpdate.birthdayAge.age.value, this.householdHeadCount, this.rosterToUpdate.maritalStatus.value);
+            if(this.rosterToUpdate.relHH.value != -1) this.rosterToUpdate.relHH.error = validateRelHH(this.rosterToUpdate.relHH.value,this.rosterToUpdate.birthdayAge.age.value, this.householdHeadCount, this.rosterToUpdate.maritalStatus.value, this.householdRoster[this.selectedRoster].relHH.value);
             if(this.rosterToUpdate.relFH.value != -1) this.rosterToUpdate.relFH.error = validateRelFH(this.rosterToUpdate.relFH.value,this.rosterToUpdate.relHH.value, this.rosterToUpdate.maritalStatus.value);
             if(this.rosterToUpdate.soloParent.value != -1) this.validateSoloParent();
         },
@@ -800,7 +883,7 @@ Vue.component('rosterForm', {
 
         validateRelHH(){
 
-            this.rosterToUpdate.relHH.error = validateRelHH(this.rosterToUpdate.relHH.value,this.rosterToUpdate.birthdayAge.age.value, this.householdHeadCount, this.rosterToUpdate.maritalStatus.value);
+            this.rosterToUpdate.relHH.error = validateRelHH(this.rosterToUpdate.relHH.value,this.rosterToUpdate.birthdayAge.age.value, this.householdHeadCount, this.rosterToUpdate.maritalStatus.value, this.householdRoster[this.selectedRoster].relHH.value);
             
             if(this.rosterToUpdate.relFH.value != -1) this.rosterToUpdate.relFH.error = validateRelFH(this.rosterToUpdate.relFH.value,this.rosterToUpdate.relHH.value, this.rosterToUpdate.maritalStatus.value);
             

@@ -167,6 +167,12 @@ var sc = new Vue({
 
         },
 
+        closeSelectBarangayArea(){
+
+        	this.showSelectBarangayArea = false;
+
+        },
+
 		showAreaAssignedSelection(){
 			this.showSelectBarangayArea = true;
 			this.areaAssignedLabel = "";

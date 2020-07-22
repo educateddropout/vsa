@@ -12,10 +12,11 @@ header('Content-Type: application/download; charset=utf-8');
 
 $returnValue = array();
 $returnValue["status"] = "ERROR";
+$userId = $_SESSION['vsa_uid'];
 
 try {
 
-	$results = $database->fetchUnsync();
+	$results = $database->fetchUnsync($userId);
 	$returnValue["status"] = "SUCCESS";
 	$returnValue["message"]["unSync"] = $results;
 

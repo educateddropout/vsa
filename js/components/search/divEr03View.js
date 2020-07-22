@@ -98,8 +98,14 @@ Vue.component('divEr03View', {
                                     </div>
                                     <br>
                                     <br>
+                                    <p class="w3-center has-text-danger is-size-5"> {{rosterError}}</p>
+                                    <br>
+                                    <br>
+                                    <p><b>Household Type</b>: {{householdType}}</p>
+
+                                    
                                     <div class="w3-row">
-                                        <table class="table is-fullwidth w3-border w3-round is-striped">
+                                        <table class="table is-fullwidth w3-border w3-round is-striped" :class="{'w3-border-red': rosterError != ''}">
                                             <thead >
                                                 <tr >
                                                     <th colspan="10" class="has-background-dark has-text-white-bis">Household Roster Detail</th>
@@ -118,7 +124,7 @@ Vue.component('divEr03View', {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="roster,index in activeHouseholdRoster">
+                                                <tr v-for="roster,index in computedFamilyRoster" v-if="roster.archive != 1">
                                                     <td>{{index+1}}</td>
                                                     <td>{{roster.firstName.value}}</td>
                                                     <td>{{roster.middleName.value}}</td>
@@ -134,8 +140,9 @@ Vue.component('divEr03View', {
                                                         
                                                     </td>
                                                     <td>{{defineRelHH(roster.relHH.value)}}</td>
-                                                    <td class="w3-border-left w3-center has-text-link pointer" @click="openUpdateRosterModal(index)"><i class="fas fa-edit"></i></td>
+                                                    <td class="w3-border-left w3-center has-text-link pointer" @click="openUpdateRosterModal(roster.id)"><i class="fas fa-edit"></i></td>
                                                     <th class="w3-border-left w3-center has-text-danger pointer" @click="deleteRoster(roster.id)"><i class="fas fa-trash-alt"></i></th>
+
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -162,6 +169,8 @@ Vue.component('divEr03View', {
                 :household-roster = "householdRoster"
                 :selected-roster = "selectedRoster"
                 :is-add-roster = "isAddRoster"
+                :household-head-count = "householdHeadCount"
+                :current-max-fn="currentMaxFn"
 
                 @close-update-roster-modal = "closeUpdateRosterModal"
                 @update-roster = "updateRoster"
@@ -234,7 +243,10 @@ Vue.component('divEr03View', {
                 purok_sitio : ""
             },
 
-            selectedRoster : 0
+            selectedRoster : 0,
+
+            householdType : "",
+            rosterError : ""
 
         }
 
@@ -242,10 +254,52 @@ Vue.component('divEr03View', {
 
     computed : {
 
-        activeHouseholdRoster(){
+        computedFamilyRoster(){
 
-            return this.householdRoster.filter(roster => roster.archive === 0);
+            return this.householdRoster.filter(roster => roster.archive != 1);
 
+        },
+
+        householdHeadCount(){
+
+            return this.computedFamilyRoster.filter((roster, index) => roster.relHH.value == 1  && index != this.selectedRow).length;
+
+        },
+
+        currentMaxFn(){
+            let retVal = 0;
+
+            if(this.computedFamilyRoster.length == 0) retVal = 0;
+            else{
+                this.computedFamilyRoster.forEach(function(roster){
+
+                    if(roster.familyNumber.value > retVal ) retVal = roster.familyNumber.value;
+
+                });
+            }
+
+            return retVal;
+        }
+
+    },
+
+    watch : {
+
+        householdRoster(){
+
+            var self = this;
+
+            this.householdRoster.forEach(function(roster){
+
+                if(roster.id >= self.highestRosterId){
+                    self.highestRosterId = roster.id;
+                }
+
+            });
+
+            this.householdType = getHouseholdType(this.computedFamilyRoster);
+            this.rosterError = validateRosters(this.computedFamilyRoster, this.pageIndicator);
+            
         }
 
     },
@@ -320,13 +374,13 @@ Vue.component('divEr03View', {
             this.showRosterUpdateModal = true;
         },
 
-        openUpdateRosterModal(index){
+        openUpdateRosterModal(id){
 
             this.isAddRoster = false;
             
-            this.selectedRoster = index;
+            this.selectedRoster = this.householdRoster.findIndex(roster => roster.id === id);
 
-            this.rosterToUpdate = _.cloneDeep(this.householdRoster[index]);
+            this.rosterToUpdate = _.cloneDeep(this.householdRoster[this.householdRoster.findIndex(roster => roster.id === id)]);
 
             this.showRosterUpdateModal = true;
         },
@@ -338,14 +392,16 @@ Vue.component('divEr03View', {
         updateRoster(){
             
             if(this.rosterToUpdate.archive != 3) this.rosterToUpdate.archive = 2; // updated 
-            this.householdRoster[this.selectedRoster] = this.rosterToUpdate;
+
+            Vue.set(this.householdRoster, this.selectedRoster, this.rosterToUpdate)
+            //this.householdRoster[this.selectedRoster] = this.rosterToUpdate;
             this.closeUpdateRosterModal();
 
         },
 
         addRoster(){
 
-            this.rosterToUpdate.archive == 3; //added
+            this.rosterToUpdate.archive = 3; //added
             this.rosterToUpdate.id = this.householdRoster.length;
             this.householdRoster.push(this.rosterToUpdate);
             this.closeUpdateRosterModal();

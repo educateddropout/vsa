@@ -4,13 +4,12 @@ function validateName(name, nameIndicator){
 
 	if(name != ""){
 
-		if (! /^[a-zA-ZÃ‘ÃÑñ±0-9'Ãƒ.,()#\-\s]+$/.test(name) && nameIndicator === 'ADDRESS') {
-		    // Validation failed
-		    msg = "Found invalid character! Please Check..";
+		if(nameIndicator === 'ADDRESS'){
+			if (! /^[a-zA-ZÃ‘ÃÑñ±0-9'Ãƒ.,()#\-\s]+$/.test(name))   msg = "Found invalid character! Please Check..";
 		} else {
-			if(! /^[a-zA-ZÃ‘ÃÑñ±0-9'Ãƒ\-\s]+$/.test(name)){
-				msg = "Found invalid character! Please Check..";
-			}
+			
+			if(! /^[a-zA-ZÃ‘ÃÑñ±0-9'Ãƒ\-\s]+$/.test(name))msg = "Found invalid character! Please Check..";
+		
 		}
 
 	} else {

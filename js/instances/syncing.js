@@ -146,7 +146,7 @@ var rp = new Vue({
 		grievanceType(index){
 			let retVal = "General Inquiry";
 
-			if(index == 3) retVal = "EX01";
+			if(index == 2) retVal = "EX01";
 			else if(index == 3) retVal = "EX02";
 			else if(index == 4) retVal = "INC01";
 			else if(index == 5) retVal = "INC02";

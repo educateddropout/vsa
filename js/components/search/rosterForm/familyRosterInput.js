@@ -7,20 +7,8 @@ Vue.component('familyRosterInput', {
                     <strong><abbr :title="object.abbr">{{object.label}}</abbr></strong>
                 </label>
             </div>
-            <!--<div class="w3-row">
-                    <v-select 
-                        :options="object.lib" label="name" :reduce="name => name.code"
-                        v-model="value.value"
-                        class="column is-12 is-paddingless"
-                        :disabled="disableCtr"
-                        :class="{'w3-border-red w3-border w3-round': value.error != ''}"
-                        @input="validateInput"
-                    ></v-select>
-                
-            </div>
-            <p class="help is-danger">{{value.error}}</p>-->
             <div class="w3-row ">
-                <input :type="type" class="input" :class="{'is-danger': value.error != ''}" max="20" :maxlength="maxLength" v-model="value.value" :disabled="disableCtr" @change="validateInput()">
+                <input :type="type" class="input upperCase" :class="{'is-danger': value.error != ''}" max="20" :maxlength="maxLength" v-model="value.value" :disabled="disableCtr" @change="validateInput()">
                 <p class="help is-danger">{{value.error}}</p>
             </div>
             <div class="w3-row " v-if="listOfSelectedPsoc.length > 0">

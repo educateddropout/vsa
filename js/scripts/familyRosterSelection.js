@@ -4049,16 +4049,17 @@ function addZero(value){
 	return msg;
 }
 
-function computeAge(dateEnumerated, day, month, year){
+function computeAge(day, month, year){
 
 	let age = "";
 
-		dEnumYear = dateEnumerated.substring(0,4);
-		dEnumMonth = dateEnumerated.substring(5,7);
-		dEnumDay = dateEnumerated.substring(8,10);
+		var todayDate = new Date().toISOString().slice(0,10);
+		dEnumYear = todayDate.substring(0,4);
+		dEnumMonth = todayDate.substring(5,7);
+		dEnumDay = todayDate.substring(8,10);
 
-		//alert(dateEnumerated + "-|_" + dEnumYear + "||" + dEnumDay + "||" + dEnumMonth);
-		//console.log(dateEnumerated);
+		//alert(todayDate + "-|_" + dEnumYear + "||" + dEnumDay + "||" + dEnumMonth);
+		//console.log(todayDate);
 		if(year != ""){
 
 			age = dEnumYear - year;

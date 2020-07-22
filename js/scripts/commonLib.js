@@ -36,8 +36,8 @@ function convertRosters(rosters){
                 caring : { value : roster.diff_care, error : '' },
                 communicating : { value : roster.diff_com, error : '' },
                 employment : { value : roster.is_employed, error : '' },
-                occupationEnumerator : { value : roster.occupation_enumerator, error : '' },
-                occupationAreaSupervisor : { value : roster.occupation_area_supervisor, error : '' },
+                occupationEnumerator : { value : roster.occupation_enumerator === null ? '' : roster.occupation_enumerator, error : '' },
+                occupationAreaSupervisor : { value : roster.occupation_area_supervisor === null ? '' : roster.occupation_area_supervisor, error : '' },
                 psoc : { value : roster.psoc, error : '' },
                 classOfWorker : { value : roster.class_of_worker, error : '' },
                 basisOfPayment : { value : roster.basis_of_payment, error : '' },
@@ -53,5 +53,55 @@ function convertRosters(rosters){
 	});
 
 	return returnValue;
+
+}
+
+// compute household type
+function getHouseholdType(familyRosters){
+
+    let msg = "Single Family";
+    let extendedFamily = false;
+    let twoOrMore = false;
+    let possiblySingle = true;
+    let hasNotSingle = false;
+    let has4_7 = false;
+    let spouseCtr = 0;
+
+    familyRosters.forEach(function(roster){
+
+        if(roster.relHH.value == 11 ) twoOrMore = true;
+
+        
+        if(roster.relHH.value >= 4 && roster.relHH.value <= 8 ) extendedFamily = true;
+
+        if(roster.relHH.value == 3 && roster.maritalStatus.value != 1){ 
+            extendedFamily = true;
+            //alert("ASDJH");
+        }
+
+        if(roster.relHH.value == 11 || roster.relHH.value == 2 || roster.relHH.value == 3 ||
+            roster.relHH.value == 5 || roster.relHH.value == 6 ||
+            roster.relHH.value == 8){
+            possiblySingle = false;
+        }
+
+        if(roster.relHH.value == 2) spouseCtr++;
+
+        if(roster.relHH.value == 1 || roster.relHH.value == 4){
+            if(roster.maritalStatus.value != 1) hasNotSingle = true;
+        }
+
+    });
+
+    if(spouseCtr > 1) extendedFamily = true;
+
+    if(twoOrMore == true) msg = "Has two or more unrelated family";
+    else if(extendedFamily == true) msg = "Extended Family"
+
+    if(possiblySingle && !hasNotSingle){
+        msg = "Single Family";
+    }
+
+    return msg;
 
 }

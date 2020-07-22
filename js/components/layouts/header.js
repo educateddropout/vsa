@@ -2,9 +2,9 @@ Vue.component('headerNav', {
 	props: ['pageCounter'],
 	template: `
 		
-		<div class="w3-row is-dark">
+		<div class="w3-row is-dark ">
 			<div class="w3-col l12 w3-border-bottom">
-				<nav class="navbar is-light" role="navigation" aria-label="main navigation ">
+				<nav class="navbar is-light priority" role="navigation" aria-label="main navigation ">
 			        <div class="navbar-brand">
 			            <a class="navbar-item" >
 			                <img src="../assets/images/Listahanan-2copy.png" width="120" height="100">
@@ -115,11 +115,12 @@ Vue.component('headerNav', {
 
         logoutSession(){
             var self = this;
-
+            
             axios.get('../php/api/logout.php')
 			.then(function (response){
 
-				self.showAuthenticationErrorMessage("It seems your not doing anything for 30 minutes. Sorry you will be log out!");
+				self.$emit("logout");
+				self.showAuthenticationErrorMessage("It seems your not doing anything for 15 minutes. Sorry you will be log out!");
 
 			})
 			.catch(function (error) {
