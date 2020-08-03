@@ -66,7 +66,7 @@ var sc = new Vue({
 
 		isShowHouseholdDetailModal : false,
 		isShowLoadingModal : false,
-		isShowStepFooter : true
+		isShowStepFooter : false
 		
 	},
 
@@ -170,12 +170,14 @@ var sc = new Vue({
         closeSelectBarangayArea(){
 
         	this.showSelectBarangayArea = false;
+        	this.toggleStepFooter();
 
         },
 
 		showAreaAssignedSelection(){
 			this.showSelectBarangayArea = true;
 			this.areaAssignedLabel = "";
+			this.toggleStepFooter();
 		},
 
 		selectAreaAssigned(areaAssignedLabel){

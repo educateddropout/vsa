@@ -20,19 +20,28 @@ $returnJson = array();
 $results = $database->authenticateUser($username,$password);
 
 if($results){ //if returns true
-	
 
-	$_SESSION['vsa_username'] = $username;
-	$_SESSION['vsa_uid'] = $results[0]['uid'];
-	$_SESSION['vsa_region'] = $results[0]['region'];
-	$_SESSION['vsa_type'] = $results[0]['user_type'];
-	$_SESSION['vsa_name'] = trim($results[0]['last_name'].", ".$results[0]['first_name']." ".$results[0]['mid_name']." ");
+	if($results[0]['user_type'] == 7){
 
-	$returnJson['success'] = true;
+		$_SESSION['vsa_username'] = $username;
+		$_SESSION['vsa_uid'] = $results[0]['uid'];
+		$_SESSION['vsa_region'] = $results[0]['region'];
+		$_SESSION['vsa_type'] = $results[0]['user_type'];
+		$_SESSION['vsa_name'] = trim($results[0]['last_name'].", ".$results[0]['first_name']." ".$results[0]['mid_name']." ");
+
+		$returnJson['success'] = true;
+
+	} else {
+		$returnJson['success'] = false;
+		$returnJson['message'] = "You're not allowed to access this system.";
+	}
+
 }
 else{
 
 	$returnJson['success'] = false;
+	$returnJson['message'] = "Please check your username or password.";
+
 }
 
 print_r(json_encode($returnJson));

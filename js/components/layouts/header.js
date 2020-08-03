@@ -39,7 +39,7 @@ Vue.component('headerNav', {
 			            <div class="navbar-end">
 			            <div class="navbar-item">
 							
-							
+							<p><b>Hi!</b> {{userData.userFullName}}</p>
 			                <div class="buttons">
 			                    &nbsp&nbsp
 			                    <a class="button is-light w3-border" @click="signOut">

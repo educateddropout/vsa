@@ -21,19 +21,19 @@ Vue.component('complaintForm', {
                                     <br>
                                     <div class="w3-row" v-if="editOn">
                                         <div class="w3-row">
-                                            <input class="input upperCase is-medium" type="text" v-model="generalInfo.firstName.value" @change="validateFirstName" :class="{ 'is-danger' : generalInfo.firstName.error != ''}" >
+                                            <input class="input upperCase is-medium" type="text" v-model="generalInfo.firstName.value" @change="validateFirstName" :class="{ 'is-danger' : generalInfo.firstName.error != ''}"  maxlength="60" >
                                             <p class="help" :class="{ 'is-danger' : generalInfo.firstName.error != ''}">First Name</p>
                                             <p class="help is-danger">{{ generalInfo.firstName.error }}</p>
                                         </div>
                                         <br>
                                         <div class="w3-row">
-                                            <input class="input upperCase is-medium" type="text" v-model="generalInfo.middleName.value"  @change="validateMiddleName" :class="{ 'is-danger' : generalInfo.middleName.error != ''}" >
+                                            <input class="input upperCase is-medium" type="text" v-model="generalInfo.middleName.value"  @change="validateMiddleName" :class="{ 'is-danger' : generalInfo.middleName.error != ''}"  maxlength="60" >
                                             <p class="help" :class="{ 'is-danger' : generalInfo.middleName.error != ''}">Middle Name</p>
                                             <p class="help is-danger">{{ generalInfo.middleName.error }}</p>
                                         </div>
                                         <br>
                                         <div class="w3-row">
-                                            <input class="input upperCase is-medium" type="text" v-model="generalInfo.lastName.value" @change="validateLastName" :class="{ 'is-danger' : generalInfo.lastName.error != ''}" >
+                                            <input class="input upperCase is-medium" type="text" v-model="generalInfo.lastName.value" @change="validateLastName" :class="{ 'is-danger' : generalInfo.lastName.error != ''}"  maxlength="60" >
                                             <p class="help" :class="{ 'is-danger' : generalInfo.lastName.error != ''}">Last Name</p>
                                             <p class="help is-danger">{{ generalInfo.lastName.error }}</p>
                                         </div>
@@ -765,6 +765,7 @@ Vue.component('complaintForm', {
 
                 this.savingModalMessage = "Saving grievance details . . . Please wait!";
                 console.log(this.generalInfo);
+                
                 axios.post('../php/api/saveComplaintDetails.php',{
             
                     generalInfo : this.generalInfo,

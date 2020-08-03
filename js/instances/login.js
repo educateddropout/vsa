@@ -49,7 +49,7 @@ var lg = new Vue({
 
 					if(response.data.success == false){
 
-						lg.loginErrorMessage = "Please check your username or password";
+						lg.loginErrorMessage = response.data.message;
 						
 					}
 					else window.location.replace("p/search.html");

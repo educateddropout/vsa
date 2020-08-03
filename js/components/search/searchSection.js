@@ -14,20 +14,20 @@ Vue.component('searchSection', {
                             <div class="w3-col l11">
                                 <div class="w3-row-padding">
                                     <div class="w3-third">
-                                        <input class="input upperCase is-medium" type="text" v-model="searchData.firstName.value" :class="{ 'is-danger' : searchData.firstName.error != ''}" :disabled="!hasSelectedMatch">
+                                        <input class="input upperCase is-medium" type="text" v-model="searchData.firstName.value" :class="{ 'is-danger' : searchData.firstName.error != ''}" :disabled="!hasSelectedMatch" maxlength="60">
                                         <p class="" :class="{ 'is-danger' : searchData.firstName.error != ''}">First Name</p>
                                         <p class="help is-danger">{{ searchData.firstName.error }}</p>
                                         <br>
                                     </div>
                                     <div class="w3-third">
-                                        <input class="input upperCase is-medium" type="text" v-model="searchData.middleName.value"   :class="{ 'is-danger' : searchData.middleName.error != ''}" :disabled="!hasSelectedMatch">
+                                        <input class="input upperCase is-medium" type="text" v-model="searchData.middleName.value"   :class="{ 'is-danger' : searchData.middleName.error != ''}" :disabled="!hasSelectedMatch" maxlength="60">
                                         <p class="" :class="{ 'is-danger' : searchData.middleName.error != ''}">Middle Name</p>
                                         <p class="help is-danger">{{ searchData.middleName.error }}</p>
                                         <br>
                                     </div>
                                     <div class="w3-third">
-                                        <input class="input upperCase is-medium" type="text" v-model="searchData.lastName.value"  :class="{ 'is-danger' : searchData.lastName.error != ''}" :disabled="!hasSelectedMatch">
-                                        <p class="" :class="{ 'is-danger' : searchData.lastName.error != ''}">Last Name</p>
+                                        <input class="input upperCase is-medium" type="text" v-model="searchData.lastName.value"  @keyup.enter="searchNames" :class="{ 'is-danger' : searchData.lastName.error != ''}" :disabled="!hasSelectedMatch" maxlength="60">
+                                        <p class="" :class="{ 'is-danger' : searchData.lastName.error != ''}" >Last Name</p>
                                         <p class="help is-danger">{{ searchData.lastName.error }}</p>
                                         <br>
                                     </div>
@@ -73,7 +73,7 @@ Vue.component('searchSection', {
         },
 
         searchNames(){
-
+            
             this.searchData.lastName.error = searchNames(this.searchData.lastName.value);
             
             if(this.searchData.lastName.error == ""){
