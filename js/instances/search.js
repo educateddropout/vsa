@@ -183,6 +183,7 @@ var sc = new Vue({
 		selectAreaAssigned(areaAssignedLabel){
 			this.showSelectBarangayArea = false;
 			this.areaAssignedLabel = areaAssignedLabel;
+			this.toggleStepFooter();
 		},
 
 		clearSearchData(){
