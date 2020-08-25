@@ -20,13 +20,13 @@ $returnValue = array();
 $returnValue["status"] = "ERROR";
 
 try {
-
+	
 	$results = $database->fetchHouseholdDetail($data);
 	$returnValue["message"]["householdDetail"] = $results;
-
+	//print_r($results);
 	$results = $database->fetchRosterDetail($data);
 	$returnValue["message"]["rosterDetail"] = $results;
-
+	//print_r($results);
 	$returnValue["status"] = "SUCCESS";
 } 
 catch(PDOException $e){

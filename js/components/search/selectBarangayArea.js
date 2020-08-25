@@ -4,7 +4,7 @@ Vue.component('selectBarangayArea', {
 
 		<div>
             <div class="modal" :class="{'is-active':isShow}">
-            <div class="modal-background"></div>
+            <div class="modal-background"  ></div>
             <div class="modal-content">
                 <div class="box">
                     <div class="w3-row w3-container">
@@ -90,6 +90,11 @@ Vue.component('selectBarangayArea', {
     },
 
 	methods: {
+
+        escape(){
+            alert("AJSKDHJKASHJKh");
+            console.log("asjlkdhajshd");
+        },
 
         selectAreaAssigned(){
             this.validateProvince();

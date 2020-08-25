@@ -59,6 +59,11 @@ Vue.component('searchedList', {
 	methods: {
 
         deleteSearched(index){
+            
+            if(typeof this.listOfSearchedNames[index].isMatch === 'undefined') this.$emit("clear-search-data");
+            else{
+                if(this.listOfSearchedNames[index].isMatch == 0) this.$emit("clear-search-data");
+            }
             this.listOfSearchedNames.splice(index, 1);
         }
 

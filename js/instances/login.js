@@ -47,6 +47,7 @@ var lg = new Vue({
 				})
 				.then(function (response){
 
+					console.log(response.data);
 					if(response.data.success == false){
 
 						lg.loginErrorMessage = response.data.message;

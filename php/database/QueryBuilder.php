@@ -6,11 +6,13 @@ class QueryBuilder
 
 	protected $pdo;
 
-	public function __construct($pdo)
+	public function __construct($pdo, $decryptor)
 
 	{
 
 		$this->pdo = $pdo;
+
+		$this->decryptor = $decryptor;
 
 	}
 
@@ -19,86 +21,105 @@ class QueryBuilder
 	public function searchNames($data){
 
 		$lastName = $data['lastName'];
+		$fLastName = substr($data['lastName'], 0,1);
 		$firstName = $data['firstName'];
+		$fFirstName = substr($data['firstName'], 0,1);
 		$middleName = $data['middleName'];
+		$fMiddleName = substr($data['middleName'], 0,1);
 
 		if($data['firstName'] === "" && $data['middleName']  === ""){
 
-			$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster
-												WHERE last_name = :lastName");
+			$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
+													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
+													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
+												FROM tbl_family_roster_validation
+												WHERE AES_DECRYPT(last_name,?) = ? AND f_last_name = ?");
 
-			$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
-			$statement->execute();
+			$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3],
+									 $this->decryptor[2], $lastName, $fLastName]);
 
-			//echo $statement->rowCount();
 			if($statement->rowCount() === 0){
 				$lastName = $data['lastName']."%";
-				$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster
-												WHERE last_name like :lastName");
+				$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
+													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
+													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
+												FROM tbl_family_roster_validation
+												WHERE AES_DECRYPT(last_name,?) like ? AND f_last_name = ?");
 
-				$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
-				$statement->execute();
+				$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3],
+									 	$this->decryptor[2], $lastName, $fLastName]);
+
 			}
 
 		} else if($data['firstName'] !== "" && $data['middleName']  === ""){
 			
-			$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster
-												WHERE last_name = :lastName AND first_name = :firstName");
+			$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
+													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
+													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
+												FROM tbl_family_roster_validation
+												WHERE AES_DECRYPT(last_name,?) = ? AND f_last_name = ?
+													AND  AES_DECRYPT(first_name,?) = ? AND f_first_name = ?");
 
-			$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
-			$statement->bindParam(':firstName',$firstName, PDO::PARAM_STR);
-			$statement->execute();
+			$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3],
+									 $this->decryptor[2], $lastName, $fLastName,$this->decryptor[0], $firstName, $fFirstName]);
+			
 
 			if($statement->rowCount() === 0){
 
 				$lastName = $data['lastName']."%";
 				$firstName = $data['firstName']."%";
 
-				$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster
-												WHERE last_name like :lastName AND first_name like :firstName");
+				$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
+													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
+													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
+												FROM tbl_family_roster_validation
+												WHERE AES_DECRYPT(last_name,?) like ? AND f_last_name = ?
+													AND  AES_DECRYPT(first_name,?) like ? AND f_first_name = ?");
 
-				$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
-				$statement->bindParam(':firstName',$firstName, PDO::PARAM_STR);
-				$statement->execute();
+				$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3],
+									 	$this->decryptor[2], $lastName, $fLastName,$this->decryptor[0], $firstName, $fFirstName]);
 			}
 
 		} else if($data['firstName'] === "" && $data['middleName']  !== ""){
-			$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster
-												WHERE last_name = :lastName AND middle_name = :middleName");
+			$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
+													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
+													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
+												FROM tbl_family_roster_validation
+												WHERE AES_DECRYPT(last_name,?) = ? AND f_last_name = ?
+													AND  AES_DECRYPT(middle_name,?) = ? AND f_middle_name = ?");
 
-			$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
-			$statement->bindParam(':middleName',$middleName, PDO::PARAM_STR);
-			$statement->execute();
+			$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3],
+									 $this->decryptor[2], $lastName, $fLastName,$this->decryptor[1], $middleName, $fMiddleName]);
 
 			if($statement->rowCount() === 0){
 				
 				$lastName = $data['lastName']."%";
 				$middleName = $data['middleName']."%";
 
-				$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster
-												WHERE last_name like :lastName AND middle_name like :middleName");
+				$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
+													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
+													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
+												FROM tbl_family_roster_validation
+												WHERE AES_DECRYPT(last_name,?) like ? AND f_last_name = ?
+													AND  AES_DECRYPT(middle_name,?) like ? AND f_middle_name = ?");
 
-				$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
-				$statement->bindParam(':middleName',$middleName, PDO::PARAM_STR);
-				$statement->execute();
+				$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3],
+									 	$this->decryptor[2], $lastName, $fLastName,$this->decryptor[1], $middleName, $fMiddleName]);
 
 			}
 
 		} else if($data['firstName'] !== "" && $data['middleName']  !== ""){
-			$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster
-												WHERE last_name = :lastName AND first_name = :firstName AND middle_name = :middleName");
+			$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
+													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
+													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
+												FROM tbl_family_roster_validation
+												WHERE AES_DECRYPT(last_name,?) = ? AND f_last_name = ?
+													AND  AES_DECRYPT(first_name,?) = ? AND f_first_name = ?
+													AND  AES_DECRYPT(middle_name,?) = ? AND f_middle_name = ?");
 
-			$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
-			$statement->bindParam(':firstName',$firstName, PDO::PARAM_STR);
-			$statement->bindParam(':middleName',$middleName, PDO::PARAM_STR);
-			$statement->execute();
+			$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3],
+									$this->decryptor[2], $lastName, $fLastName,$this->decryptor[0], $firstName, $fFirstName,
+									$this->decryptor[1], $middleName, $fMiddleName]);
 
 			if($statement->rowCount() === 0){
 				
@@ -106,14 +127,17 @@ class QueryBuilder
 				$firstName = $data['firstName']."%";
 				$middleName = $data['middleName']."%";
 
-				$statement = $this->pdo->prepare("SELECT first_name, last_name, middle_name, ext_name, hh_id, sex, birthdate
-												FROM tbl_family_roster
-												WHERE last_name like :lastName AND first_name like :firstName AND middle_name like :middleName");
+				$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
+													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
+													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
+												FROM tbl_family_roster_validation
+												WHERE AES_DECRYPT(last_name,?) like ? AND f_last_name = ?
+													AND  AES_DECRYPT(first_name,?) like ? AND f_first_name = ?
+													AND  AES_DECRYPT(middle_name,?) like ? AND f_middle_name = ?");
 
-				$statement->bindParam(':lastName',$lastName, PDO::PARAM_STR);
-				$statement->bindParam(':firstName',$firstName, PDO::PARAM_STR);
-				$statement->bindParam(':middleName',$middleName, PDO::PARAM_STR);
-				$statement->execute();
+				$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3],
+									 	$this->decryptor[2], $lastName, $fLastName,$this->decryptor[0], $firstName, $fFirstName,
+										$this->decryptor[1], $middleName, $fMiddleName]);
 
 			}
 
@@ -125,7 +149,7 @@ class QueryBuilder
 	public function fetchHouseholdDetail($data){
 
 		$statement = $this->pdo->prepare("SELECT th.hh_id, th.region_code, th.province_code, th.city_code, th.barangay_code, lr.region_name, lp.province_name, lc.city_name, lb.barangay_name, th.purok_sitio, th.street_address, th.type_of_hh, th.respondent, th.poor
-											FROM tbl_household th
+											FROM tbl_household_validation th
 											INNER JOIN lib_regions lr ON th.region_code = lr.region_code
 											INNER JOIN lib_provinces lp ON th.province_code = lp.province_code
 											INNER JOIN lib_cities lc ON th.city_code = lc.city_code
@@ -154,18 +178,20 @@ class QueryBuilder
 
 	public function fetchRosterDetail($data){
 
-		$statement = $this->pdo->prepare("SELECT uuid as 'roster_id', hh_id, first_name, last_name, middle_name, ext_name, sex, is_pregnant, rel_hh, birthdate,
-												birth_month, birth_day, birth_year, assessment_age, is_pregnant, marital_status, solo_parent, rel_hh, rel_fh, family_number,
+		$statement = $this->pdo->prepare("SELECT uuid as 'roster_id', hh_id, AES_DECRYPT(first_name,?) as first_name,
+		 										AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
+												AES_DECRYPT(ext_name,?) as ext_name, sex, is_pregnant, rel_hh, AES_DECRYPT(birthdate,?) as birthdate,
+												AES_DECRYPT(birth_day,?) as birth_day, AES_DECRYPT(birth_month,?) as birth_month, AES_DECRYPT(birth_year,?) as birth_year, assessment_age, is_pregnant, marital_status, solo_parent, rel_hh, rel_fh, family_number,
 												diff_see, diff_hear, diff_walk, diff_rem, diff_care, diff_com, is_attending_sch, hea, is_employed, 
 												occupation_enumerator, occupation_area_supervisor, psoc, class_of_worker, basis_of_payment, nature_of_employment,
 												is_overseas, how_often, ofi, is_sending_money
 
-											FROM tbl_family_roster
+											FROM tbl_family_roster_validation
 
 											WHERE hh_id = ?
 											ORDER BY rel_hh, last_name, first_name");
 
-		$statement->execute([$data['hhid']]);
+		$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3], $this->decryptor[4], $this->decryptor[5], $this->decryptor[6],$data['hhid']]);
 		
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -384,9 +410,9 @@ class QueryBuilder
 																		nature_of_employment, is_overseas, is_sending_money, how_often, last_modified,
 																		last_modified_by, is_update)
 																	VALUES
-																	(?, ?, ?, ?,
-																		?, ?, ?, ?, ?,
-																		?, ?, ?, ?, ?,
+																	(?, ?, ?, AES_ENCRYPT(?, ?),
+																		AES_ENCRYPT(?, ?), AES_ENCRYPT(?, ?), AES_ENCRYPT(?, ?), AES_ENCRYPT(?, ?), AES_ENCRYPT(?, ?),
+																		AES_ENCRYPT(?, ?), AES_ENCRYPT(?, ?), ?, ?, ?,
 																		?, ?, ?, ?, ?,
 																		?, ?, ?, ?, ?,
 																		?, ?, ?, ?, ?,
@@ -394,7 +420,7 @@ class QueryBuilder
 																		?, ?, ?, ?, ?,
 																		?, ?)");
 
-								$statement->execute(saveRoster($roster, $complaintUuid, $householdDetail['hh_id'], $currentDate, $userId));
+								$statement->execute(saveRoster($roster, $complaintUuid, $householdDetail['hh_id'], $currentDate, $userId, $this->decryptor));
 
 							}
 
@@ -465,7 +491,7 @@ function guidv4($data = null)
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
-function saveRoster($roster, $complaintId, $householdId, $currentDate, $userId){
+function saveRoster($roster, $complaintId, $householdId, $currentDate, $userId, $decryptor){
 
 	$rosterArray = array();
 	$uuid = $roster['archive'] === '3' ? guidv4() : $roster['id'];
@@ -519,9 +545,9 @@ function saveRoster($roster, $complaintId, $householdId, $currentDate, $userId){
     $howOften = $roster['howOften']['value'];
     $isUpdated = $roster['archive'] == '0' ? 'N' : 'Y';
 
-	array_push($rosterArray, $complaintId, $uuid, $hhid, $lastName,
-				$firstName, $middleName, $extName, $birthMonth, $birthDay,
-				$birthYear, $birthdate, $age, $sex, $pregnant,
+	array_push($rosterArray, $complaintId, $uuid, $hhid, $lastName, $decryptor[2],
+				$firstName, $decryptor[0], $middleName, $decryptor[1], $extName, $decryptor[7], $birthMonth, $decryptor[5], $birthDay, $decryptor[4],
+				$birthYear, $decryptor[6], $birthdate, $decryptor[3], $age, $sex, $pregnant,
 				$maritalStatus, $soloParent, $relHH, $relFH, $familyNumber,
 				$seeing, $hearing, $walking, $remembering, $caring,
 				$communicating, $attendingSchool, $highestEducationAttained, $employment, $occupationEnumerator,

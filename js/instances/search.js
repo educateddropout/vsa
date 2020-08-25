@@ -109,7 +109,6 @@ var sc = new Vue({
             })
             .then(function (response){
                 
-                console.log(response.data);
                 if(response.data.status == "SUCCESS"){
                     self.libProvinces = response.data.message;
                 }
@@ -188,6 +187,8 @@ var sc = new Vue({
 
 		clearSearchData(){
 
+			this.hasSelectedMatch = true;
+
 			this.search = {
 				firstName : { value : '', error : ''},
 				middleName : { value : '', error : ''},
@@ -205,7 +206,7 @@ var sc = new Vue({
 			this.listOfSearchedNames[this.listOfSearchedNames.length - 1].hhid = this.householdDetail.hh_id;
 			this.listOfSearchedNames[this.listOfSearchedNames.length - 1].poorStatus = this.householdDetail.poor;
 
-			this.hasSelectedMatch = true;
+			
 			this.clearSearchData();
 
 		},
@@ -217,7 +218,6 @@ var sc = new Vue({
 			this.listOfSearchedNames[this.listOfSearchedNames.length - 1].hhid = "";
 			this.listOfSearchedNames[this.listOfSearchedNames.length - 1].poorStatus = -1;
 
-			this.hasSelectedMatch = true;
 			this.clearSearchData();
 
 		},
@@ -283,6 +283,7 @@ var sc = new Vue({
 			this.generalInfo.streetAddress = { value : '', error : ''};
 			this.generalInfo.selectedHHID = { value : -1, error : ''};
 			this.generalInfo.remarks = { value : "", error : ''};
+			this.clearSearchData();
 
 			if(stepNumber == 1){
 
@@ -369,6 +370,7 @@ var sc = new Vue({
             })
             .then(function (response){
             	
+            	console.log(response.data);
             	if(response.data.status == "SUCCESS"){
             		self.searchNamesList = response.data.message;
             		self.stopCount();
@@ -441,7 +443,6 @@ var sc = new Vue({
             })
             .then(function (response){
 
-            	console.log(response.data);
             	if(response.data.status == "SUCCESS"){
             		self.grievanceList = response.data.message;
             	}

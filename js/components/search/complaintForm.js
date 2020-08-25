@@ -270,11 +270,7 @@ Vue.component('complaintForm', {
                                     <div class="select is-fullwidth is-medium" :class="{'is-danger':generalInfo.idPresented.error !== ''}">
                                         <select v-model="generalInfo.idPresented.value" @change="validateIdPresented">
                                             <option value="-1" disabled>Please select</option>
-                                            <option value="1">Barangay ID</option>
-                                            <option value="2">National ID</option>
-                                            <option value="3">UMID</option>
-                                            <option value="4">Police Clearance</option>
-                                            <option value="5">Birth Certification</option>
+                                            <option v-for="id in libIdType" :value="id.value">{{id.label}}</option>
                                         </select>
                                         <p class="help is-danger">{{generalInfo.idPresented.error}}</p>
                                     </div>
@@ -386,6 +382,7 @@ Vue.component('complaintForm', {
 
             libExtensionNames : extNameSelection(),
             libGrievanceType : grievanceTypeSelection(),
+            libIdType : idTypeSelection(),
             libMonth : monthSelection(),
             libDay : daySelection(),
             libYear : yearSelection(),
@@ -913,6 +910,27 @@ function grievanceTypeSelection(){
                 { 'label' : 'ER01', 'value' : 6 },
                 { 'label' : 'ER03', 'value' : 7 },
                 { 'label' : 'TR01', 'value' : 8 }
+            ];
+
+}
+
+function idTypeSelection(){
+
+    return [
+                { 'label' : 'SSS ID', 'value' : 1 },
+                { 'label' : 'TIN ID', 'value' : 2 }, 
+                { 'label' : 'GSIS ID', 'value' : 3 },
+                { 'label' : 'Philhealth ID', 'value' : 4 },
+                { 'label' : "Driver's License", 'value' : 5 },
+                { 'label' : "Voter's ID", 'value' : 6 },
+                { 'label' : "PRC ID", 'value' : 7 },
+                { 'label' : "Senior Citizen ID", 'value' : 8 },
+                { 'label' : "OFW ID", 'value' : 9 },
+                { 'label' : "Passport", 'value' : 10 },
+                { 'label' : "Seafarer's Record Book", 'value' : 11 },
+                { 'label' : "Birth Certificate", 'value' : 12 },
+                { 'label' : "Barangay ID", 'value' : 13 }
+
             ];
 
 }
