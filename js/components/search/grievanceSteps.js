@@ -7,7 +7,7 @@ Vue.component('grievanceSteps', {
                 <div class="content " >
                     <div class="w3-row has-text-white">
 
-                        <div class="steps">
+                        <div class="steps is-small">
                             <div class="step-item" :class="{'is-completed is-info':stepCounter > 1}">
                                 <div class="step-marker pointer" @click="openMoveToStep(1)">
                                     <span v-if="stepCounter < 2">1</span>
@@ -16,7 +16,7 @@ Vue.component('grievanceSteps', {
                                     </span>
                                 </div>
                                 <div class="step-details">
-                                    <p class="step-title pointer" @click="openMoveToStep(1)">Step 1</p>
+                                    <span class="step-title pointer" @click="openMoveToStep(1)">Step 1</span>
                                     <p>Complete Name of the Person Inquires</p>
                                 </div>
                             </div>
@@ -28,7 +28,7 @@ Vue.component('grievanceSteps', {
                                     </span>
                                 </div>
                                 <div class="step-details">
-                                    <p class="step-title pointer" @click="openMoveToStep(2)">Step 2</p>
+                                    <span class="step-title pointer" @click="openMoveToStep(2)">Step 2</span>
                                     <p>Searching of Names</p>
                                 </div>
                             </div>
@@ -40,7 +40,7 @@ Vue.component('grievanceSteps', {
                                     </span>
                                 </div>
                                 <div class="step-details">
-                                    <p class="step-title pointer" >Step 3</p>
+                                    <span class="step-title pointer" >Step 3</span>
                                     <p>Completion of Grivance Form</p>
                                 </div>
                             </div>

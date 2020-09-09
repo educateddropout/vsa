@@ -1,4 +1,7 @@
-
+nav.navbar {
+  border-top: 4px solid #276cda;
+  margin-bottom: 1rem;
+}
 
 .fullheight{
     height: 100vh;
@@ -15,6 +18,7 @@
 .upperCase { text-transform:uppercase;}
 .not-allowed {cursor: not-allowed;}
 .priority {z-index: 1000;}
+.bold { font-weight: 700 }
 
 div.sticky {
     position: -webkit-sticky;

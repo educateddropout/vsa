@@ -1,6 +1,5 @@
 
 
-
 var sc = new Vue({
 
 	el: '#search',
@@ -230,8 +229,14 @@ var sc = new Vue({
 		},
 
 		hideLoadingModal(){
+
 			this.isShowLoadingModal = false;
 			this.count = 0;
+
+			console.log(this.$refs.searchListDiv.$refs.searchResult);
+            this.$refs.searchListDiv.$refs.searchResult.focus();
+            
+
 		},
 
 		getHouseholdDetail(hhid){
@@ -308,6 +313,7 @@ var sc = new Vue({
 			this.generalInfo.province.value = this.areaAssignment.province.value;
 			this.generalInfo.city.value = this.areaAssignment.city.value;
 			this.generalInfo.barangay.value = this.areaAssignment.barangay.value;
+			this.clearSearchData();
 
 		},
 
@@ -379,6 +385,8 @@ var sc = new Vue({
             		if(response.data.message.length == 0){
             			self.noMatchHousehold();
             		}
+            			
+            		
             	}
 
             })

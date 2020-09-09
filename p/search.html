@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="../css/lib/bulma/css/bulma.min.css">
     <link rel="stylesheet" type="text/css" href="../css/lib/w3css/v4/w3.css">
     <link rel="stylesheet" type="text/css" href="../css/specific/sac.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/vue-select.css"> 
     <link rel="stylesheet" type="text/css" href="../css/lib/bulma-modal-fx-1.1.0/dist/css/modal-fx.min.css"> 
     <link rel="stylesheet" type="text/css" href="../css/lib/bulma-steps/dist/css/bulma-steps.min.css"> 
     <link rel="stylesheet" type="text/css" href="../css/lib/bulma-divider/dist/css/bulma-divider.min.css"> 
@@ -32,11 +33,12 @@
         ></header-nav>
         
         <div class="w3-row">
-            <div class="w3-col l2"> &nbsp </div>
-            <div class="w3-col l8">
+            <div class="w3-col l1"> &nbsp </div>
+            <div class="w3-col l10">
                 
                 <br>
                 <div v-if="stepCounter == 1">
+                    <br><br>
                     <select-barangay-area
                         ref = "selectBarangayArea"
                         :is-show = "showSelectBarangayArea"
@@ -53,9 +55,12 @@
                         
                     ></select-barangay-area>
 
+
                     <div class="w3-row w3-center">
                         <span @click="showAreaAssignedSelection" class="pointer"><strong>{{areaAssignedLabel}}</strong></span>
+                        <p class="is-size-7 has-text-info"> Always remember. This <span class="has-text-black">(<i class="fas fa-level-up-alt"></i>)</span> is your designated area of assignment. Complainant must be residing in this barangay.</p>
                     </div>
+
                     <br>
                     <name-requirements
                         :general-info = "generalInfo"
@@ -68,6 +73,7 @@
                 
                 <div v-else-if="stepCounter == 2">
 
+                    <br><br>
                     <loading-modal
                         :search-names-list = "searchNamesList"
                         :count = "count"
@@ -82,7 +88,7 @@
                     </div>
                     <br>
 
-                    <div class="w3-row box">
+                    <div class="w3-row box w3-card">
                         
                         <search-section
                             :search-data = "search"
@@ -109,6 +115,7 @@
                             <strong><div class="is-divider" data-content="Search Result"></div></strong>
                             
                             <search-list-div
+                                ref = "searchListDiv"
                                 :has-selected-match =  "hasSelectedMatch"
                                 :search-names-list = "searchNamesList"
                                 @get-household-detail = "getHouseholdDetail"
@@ -155,8 +162,8 @@
                 <br><br><br><br><br><br><br><br><br>
 
             </div>
-            <div class="w3-col l2">
-                <div class="w3-row w3-border-left " style="height: 90vh; overflow-y: auto;" v-show="stepCounter == 1">
+            <div class="w3-col l1">
+                <!-- <div class="w3-row w3-border-left " style="height: 90vh; overflow-y: auto;" v-show="stepCounter == 1">
                     <div class="w3-row" >
                         <br>
                         <div class="w3-row w3-container has-text-link is-size-5">
@@ -173,7 +180,7 @@
                         <br>
                         <br>
                     </div>
-                </div>
+                </div> -->
                 &nbsp 
              </div>
         </div>
@@ -191,6 +198,7 @@
 
     <!-- script frame -->
     <script src="../js/lib/vue/dist/vue.js"></script>
+    <script src="../js/lib/vue-select.js"></script>
     <script src="../js/lib/axios/dist/axios.min.js"></script>
     <script src="../js/lib/moment/min/moment.min.js"></script>
     <script src="../js/components/layouts/header.js"></script>

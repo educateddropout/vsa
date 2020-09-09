@@ -3,7 +3,7 @@ Vue.component('complaintForm', {
 	template: `
 
 		<div class=" w3-row">
-            
+            <br><br>
             <div class="w3-col l3">&nbsp</div>
             <div class="w3-col l6 w3-card-4 w3-round-large">
                 
@@ -704,7 +704,7 @@ Vue.component('complaintForm', {
 
             } else if(this.generalInfo.typeOfComplaint.value == 3){
                 if(this.listOfSearchedNames.filter(list => list.isMatch == 1).length > 0){
-                    this.generalInfo.typeOfComplaint.error = "All of Searched Name/s should should be tagged as 'No Match.'";
+                    this.generalInfo.typeOfComplaint.error = "All of Searched Name/s should be tagged as 'No Match.'";
                 }
             }
 
@@ -775,7 +775,7 @@ Vue.component('complaintForm', {
 
                     console.log(response.data);
                     if(response.data.status == "SUCCESS"){
-                        self.savingModalMessage = "Successfully saved grievance. Thank you!";
+                        self.savingModalMessage = "Successfully saved grievance - '" + response.data.message + "'. Thank you!";
                         self.isSaving = 1;
                     } else {
                         self.savingModalMessage = "Error in saving. Please contact your system administrator.";

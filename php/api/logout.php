@@ -10,5 +10,6 @@ header("Content-Type: application/json; charset=UTF-8");
 	unset($_SESSION['vsa_type']);
 	unset($_SESSION['vsa_uid']);
 	unset($_SESSION['vsa_username']);
-
+	unset($_SESSION['vsa_region_name']);
+	
 ?>

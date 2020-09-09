@@ -9,6 +9,7 @@ Vue.component('selectBarangayArea', {
                 <div class="box">
                     <div class="w3-row w3-container">
                         <div class="w3-row">
+                            <br>
                             <p class="is-size-5"><strong> Please Select Area </strong></p>
                         </div>
                         <div class="is-divider"></div>
@@ -17,7 +18,7 @@ Vue.component('selectBarangayArea', {
                             <p><strong>Region</strong></p>
                             <div class="select is-fullwidth is-medium" :class="{'is-danger': areaAssignment.region.error !== ''}">
                                 <select v-model="areaAssignment.region.value" disabled>
-                                    <option :value='-1'>Select dropdown</option>
+                                    <option :value='-1' disabled>Select dropdown</option>
                                     <option v-for="region in libRegions" :value="region.region_code">{{region.region_name}}</option>
                                 </select>
                             </div>
@@ -32,7 +33,7 @@ Vue.component('selectBarangayArea', {
                             <p><strong>Province</strong></p>
                             <div class="select is-fullwidth is-medium" :class="{'is-danger': areaAssignment.province.error !== ''}">
                                 <select v-model="areaAssignment.province.value" @change="changeProvince" @blur="validateProvince">
-                                    <option :value='-1'>Select dropdown</option>
+                                    <option :value='-1' disabled>Select dropdown</option>
                                     <option v-for="province in libProvinces" :value="province.province_code">{{province.province_name}}</option>
                                 </select>
                             </div>
@@ -46,7 +47,7 @@ Vue.component('selectBarangayArea', {
                             <p><strong>Municipality/City</strong></p>
                             <div class="select is-fullwidth is-medium" :class="{'is-danger': areaAssignment.city.error !== ''}">
                                 <select v-model="areaAssignment.city.value" @change="changeCity" @blur="validateCity" >
-                                    <option :value='-1'>Select dropdown</option>
+                                    <option :value='-1' disabled>Select dropdown</option>
                                     <option v-for="city in libCities" :value="city.city_code">{{city.city_name}}</option>
                                 </select>
                             </div>
@@ -61,7 +62,7 @@ Vue.component('selectBarangayArea', {
                             <p><strong>Barangay</strong></p>
                             <div class="select is-fullwidth is-medium" :class="{'is-danger': areaAssignment.barangay.error !== ''}">
                                 <select v-model="areaAssignment.barangay.value" @change="validateBarangay" >
-                                    <option :value='-1'>Select dropdown</option>
+                                    <option :value='-1' disabled>Select dropdown</option>
                                     <option v-for="barangay in libBarangay" :value="barangay.barangay_code">{{barangay.barangay_name}}</option>
                                 </select>
                             </div>
@@ -85,7 +86,7 @@ Vue.component('selectBarangayArea', {
 
     data(){
         return {
-            libExtensionNames : extNameSelection(),
+            
         }
     },
 

@@ -16,7 +16,78 @@ class QueryBuilder
 
 	}
 
+	public function fetchStatGrievanceType($code, $statCtr){
 
+		if($statCtr == 1){
+
+			$statement = $this->pdo->prepare("SELECT p.province_code AS 'code', p.province_name AS 'name',
+
+												SUM(IF(complaint_type = 1,1,0)) AS 'c_1',
+												SUM(IF(complaint_type = 2,1,0)) AS 'c_2',
+												SUM(IF(complaint_type = 3,1,0)) AS 'c_3',
+												SUM(IF(complaint_type = 4,1,0)) AS 'c_4',
+												SUM(IF(complaint_type = 5,1,0)) AS 'c_5',
+												SUM(IF(complaint_type = 6,1,0)) AS 'c_6',
+												SUM(IF(complaint_type = 7,1,0)) AS 'c_7',
+												SUM(IF(complaint_type = 8,1,0)) AS 'c_8',
+												count(1) AS 'total'
+
+												FROM lib_provinces p
+
+												LEFT JOIN tbl_grievance g ON p.province_code = g.complainant_province_code
+												WHERE p.region_code = ? 
+												GROUP BY p.province_code WITH ROLLUP");
+			
+
+		} else if($statCtr == 2){
+
+			$statement = $this->pdo->prepare("SELECT p.city_code AS 'code', p.city_name AS 'name',
+
+												SUM(IF(complaint_type = 1,1,0)) AS 'c_1',
+												SUM(IF(complaint_type = 2,1,0)) AS 'c_2',
+												SUM(IF(complaint_type = 3,1,0)) AS 'c_3',
+												SUM(IF(complaint_type = 4,1,0)) AS 'c_4',
+												SUM(IF(complaint_type = 5,1,0)) AS 'c_5',
+												SUM(IF(complaint_type = 6,1,0)) AS 'c_6',
+												SUM(IF(complaint_type = 7,1,0)) AS 'c_7',
+												SUM(IF(complaint_type = 8,1,0)) AS 'c_8',
+												count(1) AS 'total'
+
+												FROM lib_cities p
+
+												LEFT JOIN tbl_grievance g ON p.city_code = g.complainant_city_code
+												WHERE p.province_code = ? 
+												GROUP BY p.city_code WITH ROLLUP");
+			
+
+		} else if($statCtr == 3){
+
+			$statement = $this->pdo->prepare("SELECT p.barangay_code AS 'code', p.barangay_name AS 'name',
+
+												SUM(IF(complaint_type = 1,1,0)) AS 'c_1',
+												SUM(IF(complaint_type = 2,1,0)) AS 'c_2',
+												SUM(IF(complaint_type = 3,1,0)) AS 'c_3',
+												SUM(IF(complaint_type = 4,1,0)) AS 'c_4',
+												SUM(IF(complaint_type = 5,1,0)) AS 'c_5',
+												SUM(IF(complaint_type = 6,1,0)) AS 'c_6',
+												SUM(IF(complaint_type = 7,1,0)) AS 'c_7',
+												SUM(IF(complaint_type = 8,1,0)) AS 'c_8',
+												count(1) AS 'total'
+
+												FROM lib_brgy p
+
+												LEFT JOIN tbl_grievance g ON p.barangay_code = g.complainant_barangay_code
+												WHERE p.city_code = ? 
+												GROUP BY p.barangay_code WITH ROLLUP");
+			
+
+		}
+
+		$statement->execute([$code]);
+
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+		
+	}
 
 	public function searchNames($data){
 
@@ -32,7 +103,7 @@ class QueryBuilder
 			$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
 													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
 													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
-												FROM tbl_family_roster_validation
+												FROM tbl_family_roster
 												WHERE AES_DECRYPT(last_name,?) = ? AND f_last_name = ?");
 
 			$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3],
@@ -43,7 +114,7 @@ class QueryBuilder
 				$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
 													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
 													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
-												FROM tbl_family_roster_validation
+												FROM tbl_family_roster
 												WHERE AES_DECRYPT(last_name,?) like ? AND f_last_name = ?");
 
 				$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3],
@@ -56,7 +127,7 @@ class QueryBuilder
 			$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
 													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
 													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
-												FROM tbl_family_roster_validation
+												FROM tbl_family_roster
 												WHERE AES_DECRYPT(last_name,?) = ? AND f_last_name = ?
 													AND  AES_DECRYPT(first_name,?) = ? AND f_first_name = ?");
 
@@ -72,7 +143,7 @@ class QueryBuilder
 				$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
 													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
 													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
-												FROM tbl_family_roster_validation
+												FROM tbl_family_roster
 												WHERE AES_DECRYPT(last_name,?) like ? AND f_last_name = ?
 													AND  AES_DECRYPT(first_name,?) like ? AND f_first_name = ?");
 
@@ -84,7 +155,7 @@ class QueryBuilder
 			$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
 													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
 													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
-												FROM tbl_family_roster_validation
+												FROM tbl_family_roster
 												WHERE AES_DECRYPT(last_name,?) = ? AND f_last_name = ?
 													AND  AES_DECRYPT(middle_name,?) = ? AND f_middle_name = ?");
 
@@ -99,7 +170,7 @@ class QueryBuilder
 				$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
 													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
 													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
-												FROM tbl_family_roster_validation
+												FROM tbl_family_roster
 												WHERE AES_DECRYPT(last_name,?) like ? AND f_last_name = ?
 													AND  AES_DECRYPT(middle_name,?) like ? AND f_middle_name = ?");
 
@@ -112,7 +183,7 @@ class QueryBuilder
 			$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
 													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
 													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
-												FROM tbl_family_roster_validation
+												FROM tbl_family_roster
 												WHERE AES_DECRYPT(last_name,?) = ? AND f_last_name = ?
 													AND  AES_DECRYPT(first_name,?) = ? AND f_first_name = ?
 													AND  AES_DECRYPT(middle_name,?) = ? AND f_middle_name = ?");
@@ -130,7 +201,7 @@ class QueryBuilder
 				$statement = $this->pdo->prepare("SELECT AES_DECRYPT(first_name,?) as first_name, 
 													AES_DECRYPT(middle_name,?) as middle_name, AES_DECRYPT(last_name,?) as last_name,
 													AES_DECRYPT(ext_name,?) as ext_name, hh_id, sex, AES_DECRYPT(birthdate,?) as birthdate
-												FROM tbl_family_roster_validation
+												FROM tbl_family_roster
 												WHERE AES_DECRYPT(last_name,?) like ? AND f_last_name = ?
 													AND  AES_DECRYPT(first_name,?) like ? AND f_first_name = ?
 													AND  AES_DECRYPT(middle_name,?) like ? AND f_middle_name = ?");
@@ -149,7 +220,7 @@ class QueryBuilder
 	public function fetchHouseholdDetail($data){
 
 		$statement = $this->pdo->prepare("SELECT th.hh_id, th.region_code, th.province_code, th.city_code, th.barangay_code, lr.region_name, lp.province_name, lc.city_name, lb.barangay_name, th.purok_sitio, th.street_address, th.type_of_hh, th.respondent, th.poor
-											FROM tbl_household_validation th
+											FROM tbl_household th
 											INNER JOIN lib_regions lr ON th.region_code = lr.region_code
 											INNER JOIN lib_provinces lp ON th.province_code = lp.province_code
 											INNER JOIN lib_cities lc ON th.city_code = lc.city_code
@@ -176,6 +247,54 @@ class QueryBuilder
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
+	public function fetchGrievanceByDate($ctr){
+
+		if($ctr == 1){
+			$statement = $this->pdo->prepare("SELECT *
+												FROM tbl_grievance
+												WHERE date(last_modified) >= NOW() - INTERVAL 3 DAY
+												ORDER BY last_modified DESC");
+		} else {
+			$statement = $this->pdo->prepare("SELECT *
+												FROM tbl_grievance
+												ORDER BY last_modified DESC");
+		}
+
+		$statement->execute([]);
+
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	public function fetchEx01($barangayCode){
+
+		$archive = 0;
+		$complaintType = 2;
+		
+		$statement = $this->pdo->prepare("SELECT *
+											FROM tbl_grievance_form
+											WHERE complaint_type = ? AND archive = ? AND barangay_code = ?
+											ORDER BY last_name, first_name, middle_name DESC");
+
+		$statement->execute([$complaintType, $archive, $barangayCode]);
+
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	public function fetchInc01($barangayCode){
+
+		$archive = 0;
+		$complaintType = 4;
+		
+		$statement = $this->pdo->prepare("SELECT *
+											FROM tbl_grievance_form
+											WHERE complaint_type = ? AND archive = ? AND barangay_code = ?
+											ORDER BY last_name, first_name, middle_name DESC");
+
+		$statement->execute([$complaintType, $archive, $barangayCode]);
+
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
 	public function fetchRosterDetail($data){
 
 		$statement = $this->pdo->prepare("SELECT uuid as 'roster_id', hh_id, AES_DECRYPT(first_name,?) as first_name,
@@ -186,10 +305,10 @@ class QueryBuilder
 												occupation_enumerator, occupation_area_supervisor, psoc, class_of_worker, basis_of_payment, nature_of_employment,
 												is_overseas, how_often, ofi, is_sending_money
 
-											FROM tbl_family_roster_validation
+											FROM tbl_family_roster
 
 											WHERE hh_id = ?
-											ORDER BY rel_hh, last_name, first_name");
+											ORDER BY rel_hh, last_name, first_name, last_modified");
 
 		$statement->execute([$this->decryptor[0], $this->decryptor[1], $this->decryptor[2], $this->decryptor[7], $this->decryptor[3], $this->decryptor[4], $this->decryptor[5], $this->decryptor[6],$data['hhid']]);
 		
@@ -202,11 +321,12 @@ class QueryBuilder
 		$synced = 'N'; // not yet synced
 		$archive = 0; // active
 
-		$statement = $this->pdo->prepare("SELECT ct.uuid, ct.first_name, ct.middle_name, ct.last_name, lb.barangay_name, ct.ext_name, ct.area_barangay_code, 
+		$statement = $this->pdo->prepare("SELECT ct.uuid, ct.first_name, ct.middle_name, ct.last_name, lb.barangay_name, ct.ext_name, 
+												ct.complainant_barangay_code, 
 												ct.last_modified, ct.complaint_type
 											FROM tbl_grievance ct
 											INNER JOIN lib_brgy lb
-												ON ct.area_barangay_code = lb.barangay_code
+												ON ct.complainant_barangay_code = lb.barangay_code
 											WHERE is_sync = ? and archive = ? and last_modified_by = ?
 											ORDER BY last_modified");
 
@@ -317,14 +437,56 @@ class QueryBuilder
 
 	}
 
+	public function updateGrievanceList($grievanceList, $userId){
+
+		$currentDate = date("Y-m-d H:i:s");
+
+		try {
+
+			$this->pdo->beginTransaction();
+
+			foreach ($grievanceList as $g) {
+
+
+				if(is_null($g["final_rating"])) $finalRating = 0;
+				else $finalRating = $g["final_rating"];
+
+				$statement = $this->pdo->prepare("UPDATE tbl_grievance_form 
+														SET q_a_1 = ?, q_b_1 = ?, q_c_1 = ?, q_c_2 = ?, q_d_1 = ?,
+															q_d_2 = ?, q_e_1 = ?, q_e_2 = ?, q_e_3 = ?, q_e_4 = ?,
+															q_f_1 = ?, q_g_1 = ?, q_g_2 = ?, q_h_1 = ?, final_rating = ?, remarks = ?
+														WHERE uuid = ?");
+
+				$statement->execute([$g["q_a_1"],$g["q_b_1"],$g["q_c_1"],$g["q_c_2"],$g["q_d_1"],
+										$g["q_d_2"],$g["q_e_1"],$g["q_e_2"],$g["q_e_3"],$g["q_e_4"],
+										$g["q_f_1"],$g["q_g_1"],$g["q_g_2"],$g["q_h_1"],$finalRating,strtoupper($g["remarks"]),
+										$g["uuid"]]);
+
+			}
+
+			$this->pdo->commit();
+			$message = "SUCCESS";
+
+		} catch (PDOExepction $e){
+
+			$this->pdo->rollBack();
+			$message = $e;
+
+		}
+
+		return $message;
+
+	}
+
 	public function saveComplaintDetails($generalInfo, $listOfSearchedNames, $userId, $barangayCode, $householdDetail, $rosterDetail){
 
 		
 		$currentDate = date("Y-m-d H:i:s");
 		$synced = 'N'; 
 		$archive = 0; // active
-		$message = "";
+		$message = array();
 		$complaintUuid = guidv4();
+		$gId = uniqidReal($generalInfo['barangay']['value'],6);
 
 		try {
 
@@ -340,45 +502,69 @@ class QueryBuilder
 													VALUES (?,?,?,?,?,
 																?,?,?,?)");
 
-				$statement->execute([$uuid, $complaintUuid, $searchName['firstName'],$searchName['middleName'],$searchName['lastName'],
-										(int)$searchName['isMatch'], (int)$searchName['poorStatus'], $searchName['hhid'], $archive]);
+				$statement->execute([$uuid, $complaintUuid, trim($searchName['firstName']),trim($searchName['middleName']),
+										trim($searchName['lastName']), (int)$searchName['isMatch'], (int)$searchName['poorStatus'], 
+										$searchName['hhid'], $archive]);
 			}
 
 			if($generalInfo['typeOfComplaint']['value'] == "1"){
 
 
 				$statement = $this->pdo->prepare("INSERT INTO tbl_grievance
-														(uuid, first_name, middle_name, last_name, 
-														ext_name, complaint_type, area_barangay_code, archive,
+														(uuid, g_id, first_name, middle_name, last_name, 
+														ext_name, complaint_type, archive,
+														complainant_region_code,
+														complainant_province_code, complainant_city_code, complainant_barangay_code,
 														last_modified, last_modified_by, is_sync)
-													VALUES (?,?,?,?,
+													VALUES (?,?,?,?,?,
+																?,?,?,
 																?,?,?,?,
 																?,?,?)");
 
-				$statement->execute([$complaintUuid,strtoupper($generalInfo['firstName']['value']),strtoupper($generalInfo['middleName']['value']),
-										strtoupper($generalInfo['lastName']['value']),strtoupper($generalInfo['extName']['value']), 
-										$generalInfo['typeOfComplaint']['value'], $barangayCode, $archive, 
-										$currentDate, $userId,$synced]);
+				$statement->execute([$complaintUuid,$gId,strtoupper(trim($generalInfo['firstName']['value'])),
+															strtoupper(trim($generalInfo['middleName']['value'])), strtoupper(trim($generalInfo['lastName']['value'])),
+															strtoupper(trim($generalInfo['extName']['value'])), $generalInfo['typeOfComplaint']['value'], $archive, 
+															$generalInfo['region']['value'], $generalInfo['province']['value'],
+															$generalInfo['city']['value'],$generalInfo['barangay']['value'], 
+															$currentDate, $userId,$synced]);
 
 			} else {
 
 					$statement = $this->pdo->prepare("INSERT INTO tbl_grievance
-													(uuid, first_name, middle_name, last_name, ext_name,
+													(uuid, g_id,first_name, middle_name, last_name, ext_name,
 													sex, birthdd, birthmm, birthyy, contact_number,
 													email_address, id_presented, complaint_type, hh_id, complainant_region_code,
 													complainant_province_code, complainant_city_code, complainant_barangay_code, purok_sitio, street_address,
-													remarks,area_barangay_code ,archive, last_modified, last_modified_by,is_sync)
-												VALUES (?,?,?,?,?,
+													remarks, archive, last_modified, last_modified_by,is_sync)
+												VALUES (?,?,?,?,?,?,
 														?,?,?,?,?,
 														?,?,?,?,?,
 														?,?,?,?,?,
-														?,?,?,?,?,?)");
+														?,?,?,?,?)");
 
-					$statement->execute([$complaintUuid,strtoupper($generalInfo['firstName']['value']),strtoupper($generalInfo['middleName']['value']),strtoupper($generalInfo['lastName']['value']),strtoupper($generalInfo['extName']['value']),
+					$statement->execute([$complaintUuid,$gId,strtoupper(trim($generalInfo['firstName']['value'])),strtoupper(trim($generalInfo['middleName']['value'])),strtoupper(trim($generalInfo['lastName']['value'])),strtoupper(trim($generalInfo['extName']['value'])),
 									$generalInfo['sex']['value'],$generalInfo['dateOfBirthDD']['value'],$generalInfo['dateOfBirthMM']['value'],$generalInfo['dateOfBirthYYYY']['value'],$generalInfo['contactNumber']['value'],
 									$generalInfo['emailAddress']['value'],$generalInfo['idPresented']['value'],$generalInfo['typeOfComplaint']['value'],$generalInfo['selectedHHID']['value'],$generalInfo['region']['value'],
-									$generalInfo['province']['value'],$generalInfo['city']['value'],$generalInfo['barangay']['value'],$generalInfo['purokSitio']['value'],$generalInfo['streetAddress']['value'],
-									strtoupper($generalInfo['remarks']['value']),$barangayCode, $archive, $currentDate, $userId,$synced]);
+									$generalInfo['province']['value'],$generalInfo['city']['value'],$generalInfo['barangay']['value'],
+									strtoupper(trim($generalInfo['purokSitio']['value'])),strtoupper(trim($generalInfo['streetAddress']['value'])),
+									strtoupper(trim($generalInfo['remarks']['value'])), $archive, $currentDate, $userId,$synced]);
+
+					if($generalInfo['typeOfComplaint']['value'] == "2" || $generalInfo['typeOfComplaint']['value'] == "4"){
+						$statement = $this->pdo->prepare("INSERT INTO tbl_grievance_form
+													(uuid, g_id,first_name, middle_name, last_name, ext_name,
+													complaint_type, hh_id, region_code,
+													province_code, city_code, barangay_code,
+													archive, last_modified, last_modified_by)
+												VALUES (?,?,?,?,?,?,
+														?,?,?,
+														?,?,?,
+														?,?,?)");
+
+						$statement->execute([$complaintUuid,$gId,strtoupper(trim($generalInfo['firstName']['value'])),strtoupper(trim($generalInfo['middleName']['value'])),strtoupper(trim($generalInfo['lastName']['value'])),strtoupper(trim($generalInfo['extName']['value'])),
+										$generalInfo['typeOfComplaint']['value'],$generalInfo['selectedHHID']['value'],$generalInfo['region']['value'],
+										$generalInfo['province']['value'],$generalInfo['city']['value'],$generalInfo['barangay']['value'],
+										$archive, $currentDate, $userId]);
+					}
 
 					if($generalInfo['typeOfComplaint']['value'] == "6" || $generalInfo['typeOfComplaint']['value'] == "7"){
 
@@ -432,7 +618,8 @@ class QueryBuilder
 			}
 
 			$this->pdo->commit();
-			$message = "SUCCESS";
+			$message["status"] = "SUCCESS";
+			$message["message"] = $gId;
 
 		} catch (PDOExepction $e){
 
@@ -450,9 +637,10 @@ class QueryBuilder
 
 		$status = 1; // active
 
-		$statement = $this->pdo->prepare("SELECT user_type, first_name, mid_name, last_name, uid, region
-											FROM sys_staff
-											WHERE username = ? and password = MD5(?) and status = ?");
+		$statement = $this->pdo->prepare("SELECT s.user_type, s.first_name, s.mid_name, s.last_name, s.uid, s.region, r.region_name											FROM sys_staff s
+												INNER JOIN lib_regions r
+													ON r.region_code = s.region
+											WHERE s.username = ? and s.password = MD5(?) and s.status = ?");
 
 		$statement->execute([$username, $password, $status]);
 
@@ -479,6 +667,18 @@ class QueryBuilder
 
 }
 
+function uniqidReal($barangayPsgc,$lenght = 6) {
+    // uniqid gives 13 chars, but you could adjust it to your needs.
+    if (function_exists("random_bytes")) {
+        $bytes = random_bytes(ceil($lenght / 2));
+    } elseif (function_exists("openssl_random_pseudo_bytes")) {
+        $bytes = openssl_random_pseudo_bytes(ceil($lenght / 2));
+    } else {
+        throw new Exception("no cryptographically secure random function available");
+    }
+    return $barangayPsgc."-1-".substr(bin2hex($bytes), 0, $lenght);
+}
+
 function guidv4($data = null)
 {	
 	$data = $data ?? random_bytes(16);
@@ -496,9 +696,9 @@ function saveRoster($roster, $complaintId, $householdId, $currentDate, $userId, 
 	$rosterArray = array();
 	$uuid = $roster['archive'] === '3' ? guidv4() : $roster['id'];
 	$hhid = $householdId;
-	$lastName = $roster['lastName']['value'];
-	$firstName = $roster['firstName']['value'] === '' ? null : $roster['firstName']['value'];
-	$middleName = $roster['middleName']['value'] === '' ? null : $roster['middleName']['value'];
+	$lastName = trim($roster['lastName']['value']);
+	$firstName = trim($roster['firstName']['value']) === '' ? null : trim($roster['firstName']['value']);
+	$middleName = trim($roster['middleName']['value']) === '' ? null : trim($roster['middleName']['value']);
 	$extName = $roster['extName']['value'] === '' ? null : $roster['extName']['value'];
 
 	if($roster['birthdayAge']['birthdayCheckbox'] == 1) {
@@ -533,9 +733,9 @@ function saveRoster($roster, $complaintId, $householdId, $currentDate, $userId, 
     $caring = $roster['caring']['value'];
     $communicating = $roster['communicating']['value'];
     $employment = $roster['employment']['value'];
-    $occupationEnumerator = $roster['occupationEnumerator']['value'] === '' ? null : $roster['occupationEnumerator']['value'];
-    $occupationAreaSupervisor = $roster['occupationAreaSupervisor']['value'] === '' ? null : $roster['occupationAreaSupervisor']['value'];
-    $psoc = $roster['psoc']['value'] === '' ? null : $roster['psoc']['value'];
+    $occupationEnumerator = $roster['occupationEnumerator']['value'] === '' ? null : trim($roster['occupationEnumerator']['value']);
+    $occupationAreaSupervisor = $roster['occupationAreaSupervisor']['value'] === '' ? null : trim($roster['occupationAreaSupervisor']['value']);
+    $psoc = $roster['psoc']['value'] === '' ? null : trim($roster['psoc']['value']);
     $classOfWorker = $roster['classOfWorker']['value'];
     $basisOfPayment = $roster['basisOfPayment']['value'];
     $natureOfEmployment = $roster['natureOfEmployment']['value'];
@@ -568,8 +768,8 @@ function saveHousehold( $household, $complaintId, $currentDate, $userId){
 	$provinceCode = $household['province_code'];
 	$cityCode = $household['city_code'];
 	$barangayCode = $household['barangay_code'];
-	$purokSitio = $household['purok_sitio'];
-	$streetAddress = $household['street_address'];
+	$purokSitio = trim($household['purok_sitio']);
+	$streetAddress = trim($household['street_address']);
 	$typeOfHh = $household['type_of_hh'];
 	$respondent = $household['respondent'];
 

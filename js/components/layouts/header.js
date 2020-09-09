@@ -2,9 +2,9 @@ Vue.component('headerNav', {
 	props: ['pageCounter'],
 	template: `
 		
-		<div class="w3-row is-dark ">
-			<div class="w3-col l12 w3-border-bottom">
-				<nav class="navbar is-light priority" role="navigation" aria-label="main navigation ">
+		<div class="w3-row" >
+			<div class="w3-col l12">
+				<nav class="navbar priority is-fixed-top w3-card" role="navigation" aria-label="main navigation">
 			        <div class="navbar-brand">
 			            <a class="navbar-item" >
 			                <img src="../assets/images/Listahanan-2copy.png" width="120" height="100">
@@ -20,19 +20,36 @@ Vue.component('headerNav', {
 			        <div id="navbarBasicExample" class="navbar-menu" :class="{'is-active' : showNavbarMobile}">
 			            <div class="navbar-start">
 
-			                <a class="navbar-item" :class="{'w3-bottombar w3-border-pink' : pageCounter == 1}" href="search.html">
-			                    <span class="has-text-link"><i class="fas fa-clipboard-list"></i></span> &nbsp GRIEVANCE
+			                <a class="navbar-item" :class="{'w3-bottombar w3-pale-blue  w3-border-blue' : pageCounter == 1}" href="search.html">
+			                    <span class="has-text-link"><i class="fas fa-clipboard-list"></i></span> &nbsp Grievance
 			                </a>
 
-			                <!-- <a class="navbar-item" :class="{'w3-bottombar w3-border-pink' : pageCounter == 2}" href="reports.html">
-			                    <span class="has-text-link"><i class="fas fa-newspaper"></i></span> &nbsp REPORTS
-			                </a> -->
-
-			                <a class="navbar-item" :class="{'w3-bottombar w3-border-pink' : pageCounter == 3}" href="syncing.html">
-			                    <span class="has-text-link"><i class="fas fa-sync"></i></span> &nbsp SYNCING
+			                <a class="navbar-item" :class="{'w3-bottombar w3-pale-blue  w3-border-blue' : pageCounter == 2}" href="reports.html">
+			                    <span class="has-text-link"><i class="fas fa-newspaper"></i></span> &nbsp Reports
 			                </a>
 
-			                
+			                <a class="navbar-item" :class="{'w3-bottombar w3-pale-blue  w3-border-blue' : pageCounter == 3}" href="syncing.html">
+			                    <span class="has-text-link"><i class="fas fa-sync"></i></span> &nbsp Syncing
+			                </a>
+
+			                <div class="navbar-item has-dropdown is-hoverable">
+								<a class="navbar-link" :class="{'w3-bottombar w3-pale-blue  w3-border-blue' : pageCounter == 4}">
+									<i class="fas fa-pencil-ruler has-text-link"></i> &nbsp Evaluation Form Encoding
+								</a>
+
+								<div class="navbar-dropdown">
+									<a class="navbar-item" href="encoding-ex.html">
+										<i class="fab fa-wpforms has-text-link"></i>&nbsp EX 01
+									</a>
+									<a class="navbar-item"  href="encoding-inc.html">
+										<i class="fab fa-wpforms has-text-link"></i>&nbsp INC 01
+									</a>
+								</div>
+							</div>
+
+			                <a class="navbar-item" :class="{'w3-bottombar w3-pale-blue  w3-border-blue' : pageCounter == 5}" href="historyLog.html">
+			                    <span class="has-text-link"><i class="fas fa-history"></i></span> &nbsp Histoy Log
+			                </a>
 
 			            </div>
 
@@ -42,8 +59,8 @@ Vue.component('headerNav', {
 							<p><b>Hi!</b> {{userData.userFullName}}</p>
 			                <div class="buttons">
 			                    &nbsp&nbsp
-			                    <a class="button is-light w3-border" @click="signOut">
-			                        <i class="fas fa-sign-out-alt"></i> &nbsp Sign out
+			                    <a class="button is-dark is-outlined" @click="signOut">
+			                        <span class="has-text-link"><i class="fas fa-sign-out-alt"></i></span> &nbsp Sign out
 			                    </a>
 			                </div>
 
@@ -73,6 +90,7 @@ Vue.component('headerNav', {
 				userFullName : "",
 				userType : -1,
 				regionCode : -1,
+				regionName : "",
 				allowedAccess : 0
 			},
 			showNavbarMobile : false,
@@ -81,6 +99,7 @@ Vue.component('headerNav', {
 
 	},
 	created(){
+
 		this.authentication();
 		this.isIdle(); 
 
@@ -159,20 +178,25 @@ Vue.component('headerNav', {
 			.then(function (response){
 
 				if(response.data.allowedAccess == 0){
+					
+					self.$emit("logout");
 					self.showAuthenticationErrorMessage("You're not allowed to access this system");
-				} 
+					
+				} else{
 
-				let userData = {
-					userId : response.data.id,
-					userName : response.data.username,
-					userType : response.data.userType,
-					regionCode : response.data.region,
-					userFullName : response.data.name,
-					allowedAccess : response.data.allowedAccess
-				};
+					let userData = {
+						userId : response.data.id,
+						userName : response.data.username,
+						userType : response.data.userType,
+						regionCode : response.data.region,
+						regionName : response.data.regionName,
+						userFullName : response.data.name,
+						allowedAccess : response.data.allowedAccess
+					};
 
-				self.userData = userData;
-				self.$emit("copy-user-data", self.userData);
+					self.userData = userData;
+					self.$emit("copy-user-data", self.userData);
+				}
 				
 
 
@@ -186,6 +210,7 @@ Vue.component('headerNav', {
 
 		showAuthenticationErrorMessage(errorMessage){
 			this.closeAuthenticationMessage = errorMessage;
+			this.$emit("close-select-barangay");
 		},
 
 		closeAuthenticationError(){

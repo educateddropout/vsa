@@ -26,6 +26,7 @@ if($results){ //if returns true
 		$_SESSION['vsa_username'] = $username;
 		$_SESSION['vsa_uid'] = $results[0]['uid'];
 		$_SESSION['vsa_region'] = $results[0]['region'];
+		$_SESSION['vsa_region_name'] = $results[0]['region_name'];
 		$_SESSION['vsa_type'] = $results[0]['user_type'];
 		$_SESSION['vsa_name'] = trim($results[0]['last_name'].", ".$results[0]['first_name']." ".$results[0]['mid_name']." ");
 

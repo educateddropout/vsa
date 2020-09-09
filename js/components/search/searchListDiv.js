@@ -12,9 +12,9 @@ Vue.component('searchListDiv', {
                         <br>
                     </div>
                     <div class="w3-row overflow" >
-                        <span class="has-text-info"><strong><i class="fas fa-poll-h"></i> Search Result/s</strong></span>
-                        <table class="table is-fullwidth is-hoverable is-striped w3-border w3-round " >
-                            <thead class="has-background-grey-dark">
+                        <span class="has-text-info" ><strong><i class="fas fa-poll-h"></i> Search Result/s</strong></span>
+                        <table class="table is-fullwidth is-hoverable is-striped w3-border w3-round " ref="searchResult" tabindex=0  >
+                            <thead class="has-background-grey-dark" >
                                 <tr>
                                     <th class=" has-text-white-bis ">#</th>
                                     <th class=" has-text-white-bis ">First Name</th>
@@ -30,7 +30,7 @@ Vue.component('searchListDiv', {
                                 </tr>
                             </thead>
                             <tbody v-show="searchNamesList.length > 0">
-                                <tr v-for="list,index in searchNamesList">
+                                <tr v-for="list,index in searchNamesList" class=" pointer" @click="getHouseholdDetail(list.hh_id)">
                                     <td>{{index+1}}</td>
                                     <td>{{list.first_name}}</td>
                                     <td>{{list.middle_name}}</td>
@@ -38,7 +38,7 @@ Vue.component('searchListDiv', {
                                     <td>{{list.ext_name}}</td>
                                     <td>{{list.sex}}</td>
                                     <td>{{list.birthdate}}</td>
-                                    <td class="has-text-link pointer" @click="getHouseholdDetail(list.hh_id)"><u>{{list.hh_id}}</u></td>
+                                    <td class="has-text-link pointer" ><u>{{list.hh_id}}</u></td>
                                 </tr>
                             </tbody>
                         </table>

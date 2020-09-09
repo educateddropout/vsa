@@ -20,7 +20,10 @@ $barangayCode = $data['generalInfo']['barangay']['value'];
 
 $results = $database->saveComplaintDetails($data['generalInfo'],$data['listOfSearchedNames'], $userId, $barangayCode, $data['householdDetail'], $data['rosterDetail']);
 
-if($results == "SUCCESS") $returnValue["status"] = $results;
+if($results['status'] == "SUCCESS"){
+	$returnValue["status"] = "SUCCESS";
+	$returnValue["message"] = $results["message"];
+} 
 else {
 	$returnValue["status"] = "ERROR";
 	$returnValue["message"] = $results;

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Validation Search App - Grievance Evaluation Form Encoding Page</title>
+
+    <link rel="stylesheet" href="../css/lib/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/w3css/v4/w3.css">
+    <link rel="stylesheet" type="text/css" href="../css/specific/sac.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-modal-fx-1.1.0/dist/css/modal-fx.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-steps/dist/css/bulma-steps.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-divider/dist/css/bulma-divider.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-checkradio/dist/css/bulma-checkradio.min.css"> 
+    
+</head>
+<body>
+    
+    <div id="encodingInc">
+        
+        <header-nav
+            :page-counter= "pageCounter"
+            @copy-user-data = "copyUserData"
+        ></header-nav>
+
+        <br>
+        <div class="w3-row">
+            <div class="w3-col l1"> &nbsp </div>
+            <div class="w3-col l10">
+                
+                <br><br><br>
+                <div class="w3-row box w3-card">
+                    <br><br>
+                    <select-barangay-area
+                        ref = "selectBarangayArea"
+                        :is-show = "showSelectBarangayArea"
+                        :user-data = "userData"
+                        :lib-regions = "libRegions"
+                        :lib-provinces = "libProvinces"
+                        :lib-cities = "libCities"
+                        :lib-barangay = "libBarangay"
+                        :area-assignment = "areaAssignment"
+
+                        @select-area-assigned = "selectAreaAssigned"
+                        @fetch-lib-cities = "fetchLibCities"
+                        @fetch-lib-barangay = "fetchLibBarangay"
+                        
+                    ></select-barangay-area>
+
+
+                    <div class="w3-row w3-center">
+                        <span @click="showAreaAssignedSelection" class="pointer has-text-link"><b><u>{{areaAssignedLabel}}</u></b></span>
+                    </div>
+
+                    <br>
+                    <br>
+                    <div class="w3-row w3-center">
+                        <p class="is-size-5"><b>Grievance Evaluation Form</b></p>
+                        <p class="is-size-6">Inclusion Grievance Type 1 (INC01)</p>
+                    </div>
+
+                    <br><br>
+                    <div class="w3-row w3-right">
+
+                        <button class="button is-outlined is-black" @click="printEvaluationForm"><i class="fas fa-file-pdf"></i> &nbsp Print Grievance Evaluation Form</button>
+
+                    </div>
+                    <br>
+
+                    <div class="is-divider" ></div>
+                    <div class="w3-row w3-margin-bottom">
+                        <div class="w3-half">
+                            <nav class="pagination" role="navigation" aria-label="pagination">
+                                <a class="pagination-previous" @click="selectPage(selectedPage-1)" :disabled="selectedPage == 1">Previous</a>
+                                <a class="pagination-next" @click="selectPage(selectedPage+1)" :disabled="selectedPage == numberOfPages">Next page</a>
+                                <ul class="pagination-list">
+                                    <li><a class="pagination-link" :class="{'is-current' : selectedPage == 1}" @click="selectPage(1)">1</a></li>
+                                    <li v-show="numberOfPages > 1"><span class="pagination-ellipsis">&hellip;</span></li>
+
+                                    <li v-show="numberOfPages > 2"><a class="pagination-link" @click="selectPage(middlePage1)" :class="{'is-current':selectedPage == middlePage1}">{{middlePage1}}</a></li>
+                                    <li v-show="numberOfPages > 3"><a class="pagination-link" @click="selectPage(middlePage2)" :class="{'is-current':selectedPage == middlePage2}">{{middlePage2}}</a></li>
+                                    <li v-show="numberOfPages > 4"><a class="pagination-link" @click="selectPage(middlePage3)" :class="{'is-current':selectedPage == middlePage3}">{{middlePage3}}</a></li>
+
+                                    <li v-show="numberOfPages > 1"><span class="pagination-ellipsis">&hellip;</span></li>
+                                    <li v-show="numberOfPages > 1"><a class="pagination-link" @click="selectPage(numberOfPages)" :class="{'is-current':selectedPage == numberOfPages}">{{numberOfPages}}</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                        <div class="w3-half">
+                            <div class="w3-row w3-right">
+
+                                <button class="button is-outlined is-warning" @click="resetGrievanceList" :disabled="!hasChanges"><i class="fas fa-sync"></i> &nbsp Reset Changes</button>
+                                <button class="button is-outlined is-link" @click="updateGrievanceList" :disabled="!hasChanges"><i class="fas fa-save"></i> &nbsp Save Changes</button>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w3-row" style="overflow-x:auto;">
+                        <table class="table w3-border w3-round is-bordered is-fullwidth is-striped is-hoverable" >
+                            <thead>
+                                <tr class="has-background-grey-dark">
+                                    <th class="has-text-white w3-center " rowspan="3" colspan="2">Tracking Number</th>
+                                    <th class="has-text-white w3-center" rowspan="3">Name of Complainant</th>
+                                    <th class="has-text-white w3-center" colspan="14">Component Indicators</th>
+                                    <td class="has-text-white w3-center" rowspan="3">Final Rating</td>
+                                    <th class="has-text-white w3-center" rowspan="3">Remarks</th>
+                                </tr>
+                                <tr class="has-background-grey-dark">
+                                    <td class="has-text-white w3-center " rowspan="2"><b>A.</b> Employable Skills</td>
+                                    <td class="has-text-white w3-center " rowspan="2"><b>B.</b> Financial Security</td>
+                                    <td class="has-text-white w3-center " colspan="2"><b>C.</b> Health</td>
+                                    <td class="has-text-white w3-center " colspan="2"><b>D.</b> Water & Sanitation</td>
+                                    <td class="has-text-white w3-center " colspan="4"><b>E.</b> Housing</td>
+                                    <td class="has-text-white w3-center " ><b>F.</b> Lighting Facility</td>
+                                    <td class="has-text-white w3-center " colspan="2"><b>G.</b> Education</td>
+                                    <td class="has-text-white w3-center " rowspan="2" ><b>H.</b> Location</td>
+                                </tr>
+                                <tr class="has-background-grey-dark">
+                                    <td class="has-text-white w3-center " >I</td>
+                                    <td class="has-text-white w3-center " >II</td>
+                                    <td class="has-text-white w3-center " >I</td>
+                                    <td class="has-text-white w3-center " >II</td>
+                                    <td class="has-text-white w3-center " >I.1</td>
+                                    <td class="has-text-white w3-center " >I.2</td>
+                                    <td class="has-text-white w3-center " >II.1</td>
+                                    <td class="has-text-white w3-center " >II.2</td>
+                                    <td class="has-text-white w3-center " >I</td>
+                                    <td class="has-text-white w3-center " >I</td>
+                                    <td class="has-text-white w3-center " >II</td>
+                                </tr>
+                                <tr class="is-size-7 has-background-grey-light" v-if="grievanceList.length != 0">
+                                    <td colspan="3">Points</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">100</td>
+                                    <td>&nbsp</td>
+                                </tr>
+                                <tr class=" has-background-grey-light" v-else="">
+                                    <td class="w3-center" colspan="19">
+                                        <span v-if="!isLoadingFetching">No result/s found &nbsp <i class="fas fa-mug-hot"></i></span>
+                                        <span v-else="isLoadingFetching">Loading Grievance List. Please wait! . . . &nbsp <i class="fas fa-spinner fa-pulse"></i></span>
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tfoot v-show="grievanceList.length != 0">
+                                <tr class="is-size-7 has-background-grey-light" >
+                                    <td colspan="3">Points</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">10</td>
+                                    <td class="w3-center">5</td>
+                                    <td class="w3-center">100</td>
+                                    <td>&nbsp</td>
+                                </tr>
+                            </tfoot>
+                            <tbody v-show="grievanceList.length != 0">
+                                <tr v-for="g,index in computedGrievanceList">
+                                    <td width="3%">{{(index+1)+(recordsCount * (selectedPage-1))}}</td>
+                                    <td width="13%">{{g.g_id}}</td>
+                                    <td width="21%">{{fullName(g)}}</td>
+                                    <td width="4%" class="pointer w3-center" @click="toggleQ1(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ1(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_a_1 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="4%" class="pointer w3-center" @click="toggleQ2(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ2(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_b_1 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="3%" class="pointer w3-center" @click="toggleQ3(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ3(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_c_1 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="3%" class="pointer w3-center" @click="toggleQ4(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ4(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_c_2 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="3%" class="pointer w3-center" @click="toggleQ5(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ5(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_d_1 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="3%" class="pointer w3-center" @click="toggleQ6(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ6(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_d_2 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="3%" class="pointer w3-center" @click="toggleQ7(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ7(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_e_1 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="3%" class="pointer w3-center" @click="toggleQ8(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ8(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_e_2 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="3%" class="pointer w3-center" @click="toggleQ9(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ9(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_e_3 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="3%" class="pointer w3-center" @click="toggleQ10(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ10(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_e_4 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="4%" class="pointer w3-center" @click="toggleQ11(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ11(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_f_1 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="3%" class="pointer w3-center" @click="toggleQ12(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ12(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_g_1 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="3%" class="pointer w3-center" @click="toggleQ13(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ13(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_g_2 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="4%" class="pointer w3-center" @click="toggleQ14(index+(recordsCount * (selectedPage-1)))" @keyup.enter.space="toggleQ14(index+(recordsCount * (selectedPage-1)))" :tabindex="(index+1)*(index+1)">
+                                        <span class="has-text-success" v-if="g.q_h_1 == 'Y'"><i class="fas fa-check"></i></span>
+                                        <span class="has-text-success" v-else=""></span>
+                                    </td>
+                                    <td width="4%" class="w3-center">{{g.final_rating}}</td>
+                                    <td width="12%"><textarea class="textarea upperCase" rows="2" v-model="grievanceList[index+(recordsCount * (selectedPage-1))].remarks"></textarea>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            
+                        </table>
+                    </div>
+
+
+                </div>
+                
+
+            </div>
+            <div class="w3-col l1"> &nbsp </div>
+        </div>
+        <br>
+        <br>
+
+        <div class="modal" :class="{'is-active': isLoadingUpdating}">
+            <div class="modal-background"></div>
+            <div class="modal-content box">
+                Saving Changes. Please wait! &nbsp <i class="fas fa-spinner fa-pulse"></i>
+            </div>
+            <button class="modal-close is-large" aria-label="close"></button>
+        </div>
+
+    </div>
+
+
+    <!-- script frame -->
+    <script src="../js/lib/vue/dist/vue.js"></script>
+    <script src="../js/lib/axios/dist/axios.min.js"></script>
+    <script src="../js/lib/moment/min/moment.min.js"></script>
+    <script src="../js/components/layouts/header.js"></script>
+    <script src="../js/lib/lodash/lodash.js"></script>
+
+
+
+    <script src="../js/scripts/complaintFormValidationRoutine.js"></script>    
+    <script src="../js/components/search/selectBarangayArea.js"></script>
+    <script src="../js/instances/encodingInc.js"></script>
+    <script src="../css/lib/bulma-modal-fx-1.1.0/dist/js/modal-fx.min.js"></script>
+
+    
+</body>
+
+</html>

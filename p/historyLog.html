@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Validation Search App - History Log Page</title>
+
+    <link rel="stylesheet" href="../css/lib/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/w3css/v4/w3.css">
+    <link rel="stylesheet" type="text/css" href="../css/specific/sac.css">
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-modal-fx-1.1.0/dist/css/modal-fx.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-steps/dist/css/bulma-steps.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-divider/dist/css/bulma-divider.min.css"> 
+    <link rel="stylesheet" type="text/css" href="../css/lib/bulma-checkradio/dist/css/bulma-checkradio.min.css"> 
+    
+</head>
+<style type="text/css">
+    .pointer {cursor: pointer;}
+    .upperCase { text-transform:uppercase;}
+    .not-allowed {cursor: not-allowed;}
+</style>
+<body>
+    
+    <div id="historyLog">
+        
+        <header-nav
+            :page-counter= "pageCounter"
+            @copy-user-data = "copyUserData"
+        ></header-nav>
+
+        <br>
+        <div class="w3-row">
+            <div class="w3-col l1"> &nbsp </div>
+            <div class="w3-col l10">
+                
+               
+
+                <br><br><br>
+                <div class="w3-row box w3-card">
+                    <div class="w3-row">
+                        <div class="w3-col l1" >&nbsp</div>
+                        <div class="w3-col l10">
+                            
+                            <br>
+                            <br>
+
+                            <div class="w3-row w3-container ">
+
+                                <div v-if="loadingUnsync">
+                                    Loading list of Unsync Grievances. Please wait!... <i class="fas fa-spinner fa-pulse"></i>
+                                </div>
+                                <div v-else="">
+                                    <div v-if="listOfGrievance.length == 0">
+                                            No Grievance/s to Sync. Cheers <span class="has-text-warning"><i class="fas fa-beer"></i></span>
+                                    </div>
+                                    <div v-else="">
+
+                                        <div class="w3-row w3-margin-bottom">
+                                            <nav class="pagination" role="navigation" aria-label="pagination">
+                                                <a class="pagination-previous" @click="selectPage(selectedPage-1)" :disabled="selectedPage == 1">Previous</a>
+                                                <a class="pagination-next" @click="selectPage(selectedPage+1)" :disabled="selectedPage == numberOfPages">Next page</a>
+                                                <ul class="pagination-list">
+                                                    <li><a class="pagination-link" :class="{'is-current' : selectedPage == 1}" @click="selectPage(1)">1</a></li>
+                                                    <li v-show="numberOfPages > 1"><span class="pagination-ellipsis">&hellip;</span></li>
+
+                                                    <li v-show="numberOfPages > 2"><a class="pagination-link" @click="selectPage(middlePage1)" :class="{'is-current':selectedPage == middlePage1}">{{middlePage1}}</a></li>
+                                                    <li v-show="numberOfPages > 3"><a class="pagination-link" @click="selectPage(middlePage2)" :class="{'is-current':selectedPage == middlePage2}">{{middlePage2}}</a></li>
+                                                    <li v-show="numberOfPages > 4"><a class="pagination-link" @click="selectPage(middlePage3)" :class="{'is-current':selectedPage == middlePage3}">{{middlePage3}}</a></li>
+
+                                                    <li v-show="numberOfPages > 1"><span class="pagination-ellipsis">&hellip;</span></li>
+                                                    <li v-show="numberOfPages > 1"><a class="pagination-link" @click="selectPage(numberOfPages)" :class="{'is-current':selectedPage == numberOfPages}">{{numberOfPages}}</a></li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+
+                                        <table class="table is-fullwidth is-striped w3-border is-medium" style="overflow-x:auto;" >
+                                            <thead>
+                                                <tr>
+                                                    <td colspan="6">
+                                                        <div class="w3-row">
+                                                            <input type="checkbox" class="w3-check" id="c1" name="c1" v-model="c1" @click="toggleSevenDays">
+                                                            <label for="c1"> Show last 7 days</label>
+                                                        </div>
+                                                    </td>
+                                                    <td colspan="2" class="w3-right-align">
+                                                        <div class="control has-icons-right">
+                                                            <input class="input upperCase" type="text" v-model="searchInput" >
+                                                            <span class="icon is-right">
+                                                                <i class="fas fa-search"></i>
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr class="has-text-white-bis has-background-grey-dark">
+                                                    <th class="has-text-white-bis">&nbsp</th>
+                                                    <th class="has-text-white-bis">Grievance ID</th>
+                                                    <th class="has-text-white-bis">First Name</th>
+                                                    <th class="has-text-white-bis">Middle Name</abbr></th>
+                                                    <th class="has-text-white-bis" >Last Name</th>
+                                                    <th class="has-text-white-bis" >Area of Complaint</abbr></th>
+                                                    <th class="has-text-white-bis">Grievance Type</th>
+                                                    <th class="has-text-white-bis">Date Of Complaint</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(g,index) in computedG">
+                                                    <td class="w3-border-right">{{(index+1)+(recordsCount * (selectedPage-1))}}</td>
+                                                    <td>{{g.g_id}}</td>
+                                                    <td>{{g.first_name}}</td>
+                                                    <td>{{g.middle_name}}</td>
+                                                    <td>{{g.last_name}}</td>
+                                                    <td>{{g.barangay_name}}</td>
+                                                    <td>{{grievanceType(g.complaint_type)}}</td>
+                                                    <td>{{g.last_modified}}</td>
+                                                </tr>
+                                            </tbody>
+                                            
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w3-col l1" >&nbsp</div>
+                    </div>
+                    <br>
+
+
+                </div>
+                
+                
+                
+                
+
+            </div>
+            <div class="w3-col l1"> &nbsp </div>
+        </div>
+    </div>
+
+
+    <!-- script frame -->
+    <script src="../js/lib/vue/dist/vue.js"></script>
+    <script src="../js/lib/axios/dist/axios.min.js"></script>
+    <script src="../js/lib/moment/min/moment.min.js"></script>
+    <script src="../js/components/layouts/header.js"></script>
+    <script src="../js/lib/lodash/lodash.js"></script>
+
+
+    <script src="../js/instances/historyLog.js"></script>
+    <script src="../css/lib/bulma-modal-fx-1.1.0/dist/js/modal-fx.min.js"></script>
+
+    
+</body>
+
+</html>
